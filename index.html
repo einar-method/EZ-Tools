@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="ezstyles.css">
+    <link rel="icon" href="Assets/eztoolslogo.png" type="image/x-icon">
+    <title>EZ Tools</title>
+</head>
+<body>
+    <section class="grid">
+        <div class="card"></div> <!-- top left corner -->
+        <div class="card">
+          <img  
+          src="./Assets/tools.png" 
+          alt="BCR"
+          width="300">
+        </div>
+        <div class="card"></div> <!-- top right corner -->
+        <div class="card"></div> <!-- top left side -->
+        <div class="card"></div> <!-- top right side -->
+        <div class="card"></div> <!-- bottom left side -->
+        <div class="card"></div> <!-- bottom right side -->
+        <div class="card">
+            <a href="#">Top</a> <!-- bottom left corner -->
+        </div>
+        <div class="card">
+            <p class="footer-txt">
+                This tool was made by Traveling Bard Games using EZD6 Core and the EZD6 Book of Quests. If you don't already have these great books, you can find them <a href="https://www.ezd6.com/" target="_blank">here</a>.
+            </p>
+        </div>
+        <div class="card"></div> <!-- bottom right corner -->
+        <div class="card">
+            <div id="tab" class="inner-box">
+                <fieldset 
+                    id="tab-toggle" 
+                    class="tab-options" 
+                >
+
+                <p class="form-para">
+                    <input 
+                    type="radio" 
+                    name="tool-toggle" 
+                    id="pc-tools" 
+                    value="pc-tools"
+                    class="tool-toggle"
+                    checked>
+                    <label for="pc-tools">Character Tools</label>
+                </p>
+
+                <p class="form-para">
+                    <input 
+                    type="radio" 
+                    name="tool-toggle" 
+                    id="rr-tools" 
+                    value="rr-tools"
+                    class="tool-toggle">
+                    <label for="rr-tools">RR Tools</label>
+                </p>
+                </fieldset>
+            </div>
+            
+            <div class="grid-box" id="pc-tab" style="display:block">
+                <section class="button-wrapper"> 
+                  
+                  <div id="pc-btns">
+                    <button class="slide" id="full">Everything!</button>
+                    <button class="slide" id="path-btn">Path</button>
+                    <button class="slide" id="race-btn">Species</button>
+                    <button class="slide" id="incli">Inclinations</button>
+                    <button class="slide" id="just-gear">Equipment</button>
+                    <button class="slide" id="basics">Basics</button>
+                    <button class="slide" id="potion">Potions</button>
+                    <button class="slide" id="scrolls">Scrolls</button>
+                    <button class="slide" id="reset">Reset</button> 
+                    <button class="slide" id="pdf-btn">To PDF</button>
+                    <div class="dice-box">
+                
+                          <p>
+                              <input 
+                              type="number" 
+                              name="die-input" 
+                              id="die-input" 
+                              min="2"
+                              max="100"
+                              placeholder="2-100"
+                              autocomplete="off">
+                          </p>
+                          <button id="dice-btn">Roll</button> 
+          
+                    </div> 
+                    
+                    <div class="wrapper">
+                      <div class="select-btn">
+                        <span>Select a Path</span>
+                        <i class="uil uil-angle-down"></i>
+                      </div>
+                      <div class="path-list">
+                        <ul class="path-items"></ul>
+                      </div>
+                    </div> 
+                  </div>
+                </section>
+                
+                <hr>
+              
+                <div class="result-container" id="pc-content">
+                  <h2><span id="name"></span></h2>
+            
+                  <section class="🌠" id="🔥">
+                    <p ><strong>Path: </strong><span id="path"></span></p>
+                    <p><strong>Boons: </strong><span id="boons"></span></p>
+                    <p><strong>Features: </strong><span id="features"></span></p>
+            
+                    <hr>
+            
+                    <p><strong>Armor Type: </strong><span id="armor"></span></p>
+                    <p><strong>Armor Save: </strong><span id="asave"></span></p>
+                    <p>
+                      <strong>Miraculous Save: </strong><span id="msave"></span>
+                    </p>
+                    
+                    <p><strong>Karma: </strong><span id="karma"></span></p>
+                    <p><strong>Wealth: </strong><span id="wealth"></span></p>
+                    <hr>
+                  </section>
+            
+                  <section class="🌠" id="🤹🏽">
+                    <p>
+                      <strong>Inclinations: </strong><span id="inclinations"></span>
+                    </p>
+                    <hr>
+                  </section>
+            
+                  <section class="🌠" id="⚔️">
+                    <p>
+                      <strong>Gear: </strong><span id="gear"></span>
+                    </p>
+                  </section>
+                  
+                  <section class="🌠" id="⚗️">
+                    <p>
+                      <br>
+                      <strong>Potions: </strong><span id="potions"></span>
+                    </p>
+                  </section>
+                
+                  <section class="🌠" id="📜">
+                    <p>
+                      <br>
+                      <strong>Scrolls: </strong><span id="scroll-choice"></span>
+                    </p>
+                  </section>
+            
+                  <section class="🌠" id="🧝🏽">
+                    <hr>
+                    <p><strong>Species: </strong><span id="species"></span></p>
+                    <br>
+                  </section>
+                  
+                  <section class="🌠" id="❤️">
+                      <p><strong>Backstory: </strong><span id="story"></span></p>
+            
+                      <br>
+                  
+                      <p><strong>Moral Core: </strong><span id="core"></span></p>
+            
+                      <br>
+            
+                      <p>
+                        <strong>Physical Description:</strong><span id="phys"></span>
+                      </p>
+                  </section>
+                </div>
+            </div>
+
+            <div id="rr-tab" style="display:none">
+                <section class="button-wrapper">
+                  <div id="rr-btns">  
+              
+                    <button class="slide" id="rrAll-btn">Everything!</button>
+                    <button class="slide" id="monsters-btn">Monster</button>
+                    <button class="slide" id="lair-btn">Lair</button>
+                    <button class="slide" id="magicItem-btn">Magic Item</button>
+                    <button class="slide" id="treasure-btn">Treasure</button>
+                    <button class="slide" id="npc-btn">NPC</button>
+                    <button class="slide" id="twist-btn">Twists</button>
+                    <button class="slide" id="quest-btn">Quests</button>
+                    <button class="slide" id="rr-reset">Reset</button>
+                  </div>
+                </section>
+            
+                <hr>
+              
+                <div class="result-container">
+                  <section class="🔮">
+                    <h4>Monster: </h4>
+                    <p id="monster"></p>
+                    <hr>
+                  </section>
+            
+                  <section class="🔮">
+                    <h4>Lair Creator: </h4>
+                    <p id="lair-locale"></p>
+                    <p id="lair-aspect"></p>
+                    <p id="lair-boss"></p>
+                    <br>
+                    <p>See page 107 for more.</p>
+                    <hr>
+                  </section>
+            
+                  <section class="🔮">
+                    <h4>Magic Item: </h4>
+                    <p id="magic-item"></p>
+                    <hr>
+                  </section>
+            
+                  <section class="🔮">
+                    <h4>Treasures: </h4>
+                    <p id="treasure"></p>
+                    <hr>
+                  </section>
+            
+                  <section class="🔮">
+                    <p><strong>NPC: </strong></p>
+                    <p id="npc"></p>
+                    <hr>
+                  </section>
+            
+                  <section class="🔮">
+                    <p><strong>Quest: </strong></p>
+                    <p id="quests"></p>
+                    <br>
+                  </section>
+            
+                  <section class="🔮">
+                    <p><strong>Twists: </strong></p>
+                    <p id="twists"></p>
+                  </section>
+            
+                </div>
+              </div>
+        </div>
+
+    </section>
+
+    <!-- The Modal -->
+    <div id="dice-modal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <p><span id="die-result"></span></p>
+        </div>
+  
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

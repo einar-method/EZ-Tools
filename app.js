@@ -1568,11 +1568,11 @@ buttons.forEach (button => {
       }else{
         button.addEventListener("click", () => {
             if (button.id != "dice-btn") {
-                const buttonAudio = new Audio ("./assets/click.mp3");
+                const buttonAudio = new Audio ("Assets/click.mp3");
                 buttonAudio.volume = 0.1;
                 buttonAudio.play();
             } else {
-                const buttonAudio = new Audio ("./assets/dice.mp3");
+                const buttonAudio = new Audio ("Assets/dice.mp3");
                 buttonAudio.volume = 0.2;
                 buttonAudio.play();
             }

@@ -1,5 +1,5 @@
 # EZ-Tools
-![EZTools Logo](https://github.com/einar-method/EZ-Tools/Assets/tools.png)
+![EZTools Logo](https://github.com/einar-method/EZ-Tools/blob/main/Assets/tools.png)
 
 
 This simple web app is a tool for the [EZD6 RPG](https://www.ezd6.com/). DM Scotty, the creator of EZD6, has it as a featured link on the game's webpage! 

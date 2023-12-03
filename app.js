@@ -57,6 +57,7 @@ const questBtn = document.getElementById("quest-btn");
 const rrScrollsBtn = document.getElementById("rr-scrolls");
 const rrResetBtn = document.getElementById("rr-reset");
 const diceBtn = document.getElementById("dice-btn");
+const pdfBtn = document.getElementById("pdf-btn");
 
 const tabToggle = document.getElementById("tab-toggle");
 const tabBtns = document.querySelectorAll('input[name="tool-toggle"]');
@@ -81,6 +82,7 @@ let gearChoice
 let scrollChoice
 let pcPath
 let pcCircle
+let pcCircleDetails = "Please look up you circle starting on pg. 35 in EZD6."
 let pcDescription
 let pcStory
 let pcSpecies
@@ -870,23 +872,12 @@ function makingElements(variable, parentId) {
     parentId.innerHTML = variable;
 }; // Not currently used.
 
-////// PDF Stuff /////
-const pdfBtn = document.getElementById("pdf-btn");
-// const makePdf = document.getElementById("pc-content");
-// pdfBtn.addEventListener("click", function () {
-//     let mywindow = window.open(displayName.innerHTML, "DOWNLOAD", "height=auto,width=600");
-//     mywindow.document.write(makePdf.innerHTML);
-//     mywindow.document.close();
-//     mywindow.focus();
-//     mywindow.print();
-//     return true;
-// });
-
 /////// PC & NPC FUNCTION BUILDING BLOCKS /////
 function rollPath() {
     pcPath = randomMath(pathsArray);
     console.log(pcPath);
 
+    // Set the dropdown to default and avoid errors
     selectBtn.firstElementChild.innerText = "Select a Path";
 
     if (pcPath === "Conjurer") {
@@ -1701,7 +1692,7 @@ async function fillForm() {
         pcInclinations.join('\n')
     );
     boonsField.setText(pathBoons);
-    sorcDetailsField.setText("Add sorc info here");
+    sorcDetailsField.setText(pcCircleDetails);
     gearField.setText(pcGearList.join(", "));
 
     detailsField.setText(pcDescription);
@@ -1722,7 +1713,7 @@ async function fillForm() {
     scrollsField.setText(
         pcScrolls.join('\n'),
     );
-    weaponsField.setText("Add your own weapon");
+    //weaponsField.setText("Add your own weapon");
     pathField.setText(pcPath);
     strikesField.setText(pcStrikes);
 

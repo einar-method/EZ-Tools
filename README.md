@@ -62,5 +62,19 @@ Ready for all of your RR rolling needs during session prep, or even on the fly. 
 
 I'm not going to go over each of the RR buttons in detail because they're all pretty simple - just get a random result from the category.
 
+## To Do
+These are things I'd like to do in the future, time permitting:
+
++ Convert the entire code to object based, with constructor templates.
++ Add an option to allow a different pdf (a community one I love).
++ Make a simple weapon generator following the guidlines in the book, and intelligently based on Path and Boons (maybe wealth too).
+
+## Known Issues
+If there are any major known issues, they will be posted below. 
+
+You can report [offcial issues here](https://github.com/einar-method/EZ-Tools/issues). 
+
+Or, feel free to [stop by in Discussions](https://github.com/einar-method/EZ-Tools/discussions) for a less formal discourse.
+
 ## License Info
 Any information herein related specifically to EZD6 should not be recreated or reused without the express permission of EZD6's creator. Everything else (specifically my coding) can be freely used however you like.

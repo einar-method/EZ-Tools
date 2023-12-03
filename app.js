@@ -1593,7 +1593,7 @@ buttons.forEach (button => {
       }
 });
 
-
+///// PDF Stuff /////
 const { degrees, PDFDocument, rgb, StandardFonts, PDFTextField, PDFRadioGroup, PDFDropdown } = PDFLib
 
 const btn = document.querySelector('#fillForm');
@@ -1687,10 +1687,19 @@ async function fillForm() {
     speciesField.setText(pcSpecies);
     wealthGroup.select(wealthOptions[wealthDropFix]);
     
-    karmaDrop.select(karmaOptions[karma]);
+    
+    
+    if (pcInclinations.length <= 0) {
+        rollInclination();
+        console.log("Auto rolled 2 Inclinations")
+    };
+
     inclField.setText(
         pcInclinations.join('\n')
     );
+
+    karmaDrop.select(karmaOptions[karma]);
+    
     boonsField.setText(pathBoons);
     sorcDetailsField.setText(pcCircleDetails);
     gearField.setText(pcGearList.join(", "));

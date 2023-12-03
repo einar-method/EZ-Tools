@@ -71,6 +71,8 @@ const MAX_MODERATE = 75000;
 const MAX_POOR = 1000;
 
 /// PC VARIABLES CALLED IN VARIOUS FUNCTIONS ///
+let pcFirstName = "";
+let pcLastName = "";
 let userChoice
 let computerChoice
 let specialComputerChoice
@@ -79,16 +81,20 @@ let gearChoice
 let scrollChoice
 let pcPath
 let pcCircle
+let pcDescription
+let pcStory
 let pcSpecies
 let pcStrikes
 let woundsSave
+let aSaveOption = 3; //for pdf
 let miracleSave
 let pcArmor
 let pathFeatures
 let pathBoons
 let karma
 let pcWealth
-let wealthTier = 0
+let wealthTier = 0;
+let wealthDropFix = 0;
 let pcPotions = [];
 let pcInclinations = [];
 let pcGearList = [];
@@ -866,15 +872,15 @@ function makingElements(variable, parentId) {
 
 ////// PDF Stuff /////
 const pdfBtn = document.getElementById("pdf-btn");
-const makePdf = document.getElementById("pc-content");
-pdfBtn.addEventListener("click", function () {
-    let mywindow = window.open(displayName.innerHTML, "DOWNLOAD", "height=auto,width=600");
-    mywindow.document.write(makePdf.innerHTML);
-    mywindow.document.close();
-    mywindow.focus();
-    mywindow.print();
-    return true;
-});
+// const makePdf = document.getElementById("pc-content");
+// pdfBtn.addEventListener("click", function () {
+//     let mywindow = window.open(displayName.innerHTML, "DOWNLOAD", "height=auto,width=600");
+//     mywindow.document.write(makePdf.innerHTML);
+//     mywindow.document.close();
+//     mywindow.focus();
+//     mywindow.print();
+//     return true;
+// });
 
 /////// PC & NPC FUNCTION BUILDING BLOCKS /////
 function rollPath() {
@@ -916,36 +922,42 @@ function showStats() {
     
     /// ### Path Specific Tasks ###
     if (pcPath === "Warrior") {
-        woundsSave = "3+ with shield / 4+ without"
-        miracleSave = "6"
+        aSaveOption = 1; //for pdf
+        woundsSave = "3+";
+        miracleSave = "6";
         pcArmor = "Heavy"
         pathBoons = "Melee, Strength Tasks"
-        pathFeatures = "Shield Sacrifice, Brutal Strikes, Dual Weapons"
+        pathFeatures = "Shield Sacrifice, Brutal Strikes, Dual Weapons, Armor save 4+ w/o shield"
     } else if (pcPath === "Warden") {
+        aSaveOption = 3; //for pdf
         woundsSave = "5+"
         miracleSave = "6"
         pcArmor = "Medium"
         pathBoons = "Ranged Weapons, Wilderness Tasks"
         pathFeatures = "Trailfinder, Forager"
-    } else if (pcPath === "Delver") {  
+    } else if (pcPath === "Delver") {
+        aSaveOption = 3; //for pdf  
         woundsSave = "5+"
         miracleSave = "6"
         pcArmor = "Medium"
         pathBoons = "Melee OR Ranged Weapons, Spelunking Tasks"
         pathFeatures = "Gear, Jack"
     } else if (pcPath === "Brute") {  
+        aSaveOption = 4; //for pdf
         woundsSave = "6"
         miracleSave = "6"
         pcArmor = "Light"
         pathBoons = "Melee, Strength Tasks"
         pathFeatures = "Enrage, Superstitious"
     } else if (pcPath === "Rascal") {  
+        aSaveOption = 4; //for pdf
         woundsSave = "6 with a boon"
         miracleSave = "6 with a boon"
         pcArmor = "Light"
         pathBoons = "Acrobatic Tasks"
-        pathFeatures = "Tricks, Gank"
+        pathFeatures = "Tricks, Gank, Boon to Armor & Miracle saves"
     } else if (pcPath === "Conjurer") {  
+        aSaveOption = 4; //for pdf
         woundsSave = "6"
         miracleSave = "6"
         pcArmor = "Light"
@@ -956,19 +968,22 @@ function showStats() {
             console.log('magic circle is ' + pcCircle)
             innerPath.innerHTML = pcPath + ". Circle of Sorcery: " + pcCircle;
         } 
-    } else if (pcPath === "Friar") {  
+    } else if (pcPath === "Friar") { 
+        aSaveOption = 3; //for pdf 
         woundsSave = "5+"
         miracleSave = "5+"
         pcArmor = "Medium"
         pathBoons = "Resist Heritical Powers (magick), Religious Knowledge"
         pathFeatures = "Empathic Healing, Holy Light"
     } else if (pcPath === "Skald") {  
+        aSaveOption = 3; //for pdf
         woundsSave = "5+"
         miracleSave = "5+"
         pcArmor = "Medium"
         pathBoons = "Lore Tasks, Performance Tasks"
         pathFeatures = "Scrollmaster, Traveler, Strands of Fate"
     } else {
+        aSaveOption = 3; //for pdf
         woundsSave = "5+"
         miracleSave = "6"
         pcArmor = "Medium"
@@ -976,9 +991,9 @@ function showStats() {
         pathFeatures = "Beastspeech, Beast Aid, Beast Friend"
     }
     
-    console.log(woundsSave)
-    console.log(miracleSave)
-    console.log(pcArmor)
+    console.log("Wounds save: " + woundsSave)
+    console.log("Miracle save: " + miracleSave)
+    console.log("PC Armor: " + pcArmor)
     console.log(pathBoons)
     console.log(pathFeatures)
     
@@ -1033,9 +1048,9 @@ function tbgFirstNames() {
 };
 
 function rollName() {
-    let pcFirstName = randomMath(firstNames);
+    pcFirstName = randomMath(firstNames);
     
-    let pcLastName = 
+    pcLastName = 
         randomMath(namesPrefix) + 
         randomMath(namesRoot) + 
         randomMath(namesSuffix)
@@ -1047,7 +1062,7 @@ function rollName() {
 };
 
 function rollAppearnace() {
-    /// Generate Appearance ###
+    /// Generate Appearance
     let bodyType = randomMath(bodyTypes);
     console.log(bodyType);
 
@@ -1126,27 +1141,34 @@ function rollCore() {
 }
 
 function rollWealth() {
+    //PLEASE NOTE: I'm not the creator of the fillable pdf being used. The original creator made an error in naming convention for the wealth radio group. The variable "wealthDropFix" exists in this code solely for the purpose of addresssing this issue. Namely, cash poor and moderate have to be manually swapped. If we can modify the radio data before use, or if we supply a better form, wealthDropFix can be removed. BE SURE TO CHECK THE PDF FUNCTION.
 
     let tempWealth = getRndInteger(1, 100000);
 
     if (tempWealth < MAX_POOR) {
         pcWealth = "Pauper";
         wealthTier = 1;
+        wealthDropFix = 0;
     } else if (tempWealth < MAX_MODERATE) {
         pcWealth = "Cash Poor";
         wealthTier = 2;
+        wealthDropFix = 2;
     } else if (tempWealth < MAX_WEALTHY) {
         pcWealth = "Moderate";
         wealthTier = 3;
+        wealthDropFix = 1;
     } else if (tempWealth < MAX_LORDLY) {
         pcWealth = "Wealthy";
         wealthTier = 4;
+        wealthDropFix = 3;
     } else if (tempWealth < MAX_KINGLY) {
         pcWealth = "Lordly";
         wealthTier = 5;
+        wealthDropFix = 4;
     } else if (tempWealth === MAX_KINGLY) {
         pcWealth = "Kingly";
         wealthTier = 6;
+        wealthDropFix = 5;
     } else {
         pcWealth = "Sorry, there was an error"
     }
@@ -1157,9 +1179,11 @@ function rollWealth() {
 function getBasics() {
     displayStory.style.display = "block";
     displayName.innerHTML = rollName();
-    innerStory.innerHTML = rollStory();
+    pcStory = rollStory();
+    innerStory.innerHTML = pcStory;
     displayCore.innerHTML = rollCore();
-    displayDescription.innerHTML = rollAppearnace();
+    pcDescription = rollAppearnace();
+    displayDescription.innerHTML = pcDescription;
     displayWealth.innerHTML = rollWealth();
 };
 
@@ -1510,10 +1534,8 @@ function reset() {
     pathFeatures = '';
     pathBoons = '';
     karma = '';
-    potion_0 = '';
-    potion_1 = '';
-    scroll_0 = '';
-    scroll_1 = '';
+    pcDescription = "";
+    pcStory = "";
     innerPath.innerHTML = '';
     displayName.innerHTML = '';
     innerSpecies.innerHTML = '';
@@ -1579,3 +1601,134 @@ buttons.forEach (button => {
         });
       }
 });
+
+
+const { degrees, PDFDocument, rgb, StandardFonts, PDFTextField, PDFRadioGroup, PDFDropdown } = PDFLib
+
+const btn = document.querySelector('#fillForm');
+
+pdfBtn.addEventListener("click", fillForm);
+
+let finalPCName = "Xamara Temp";
+
+async function fillForm() {
+    // Fetch the PDF with form fields
+    const formUrl = "Assets/ezd6PCform.pdf";
+    const formPdfBytes = await fetch(formUrl).then(res => res.arrayBuffer());
+
+    // Load a PDF with form fields
+    const pdfDoc = await PDFDocument.load(formPdfBytes);
+
+    // Get the form containing all the fields
+    const form = pdfDoc.getForm();
+
+    //Find form fields and set the default font size
+    const fields = form.getFields();
+
+    fields.forEach(field => {
+
+        if (field instanceof PDFTextField) {
+            const type = "Text Field";
+            const name = field.getName();
+            console.log(`${type}: ${name}`);
+        }
+        if (field instanceof PDFRadioGroup) {
+            const type = "Radio Group";
+            const name = field.getName();
+            const options = field.getOptions()
+            console.log(`${type}: ${name} | ` + 'Options:', options);
+        }
+        if (field instanceof PDFDropdown) {
+            const type = "Dropdown";
+            const name = field.getName();
+            const options = field.getOptions()
+            console.log(`${type}: ${name} | ` + 'Options:', options)
+        }
+    });
+
+    // Set metadata
+    pdfDoc.setTitle("EZD6 CS");
+    pdfDoc.setAuthor("EZ Tools, by TBG");
+
+    // Get all fields in the PDF by their names
+    const nameField = form.getTextField('Name');
+    const speciesField = form.getTextField('Species');
+    const inclField = form.getTextField('Inclinations');
+    inclField.setFontSize(12); //default huge for some reason
+
+
+    const boonsField = form.getTextField('Boons');
+    const sorcDetailsField = form.getTextField('Sorcery');
+    const gearField = form.getTextField('Equipment');
+    const karmaDrop = form.getDropdown('Karma');
+    const karmaOptions = karmaDrop.getOptions();
+
+    const wealthGroup = form.getRadioGroup('Group1');
+    const wealthOptions = wealthGroup.getOptions();
+
+    const detailsField = form.getTextField('Equipment 2');
+    const featuresField = form.getTextField('Features');
+    featuresField.setFontSize(13); //default strange size
+
+    const sorcCircleField = form.getTextField('Circle');
+    const armorField = form.getTextField('Armor');
+
+    const potionsField = form.getTextField('Potions');
+    const scrollsField = form.getTextField('Scrolls');
+    const weaponsField = form.getTextField('Weapons');
+    const pathField = form.getTextField('Path');
+    const strikesField = form.getTextField('Strikes');
+    strikesField.setFontSize(60); //more legible
+    strikesField.setAlignment(1); //1 for center in pdf-lib
+
+    const heroDrop = form.getDropdown('Hero Die');
+    const heroOptions = heroDrop.getOptions();
+
+    const aSaveDrop = form.getDropdown('Armor Save');
+    aSaveDrop.setOptions(['2+', '3+', '4+', '5+', '6'])
+    const aSaveOptions = aSaveDrop.getOptions();
+
+    const healthField = form.getTextField('Health');
+    const aspectsField = form.getTextField('Aspects');
+
+    // Fill in pdf fields
+    nameField.setText(pcFirstName + " " + pcLastName);
+    speciesField.setText(pcSpecies);
+    wealthGroup.select(wealthOptions[wealthDropFix]);
+    
+    karmaDrop.select(karmaOptions[karma]);
+    inclField.setText(
+        pcInclinations.join('\n')
+    );
+    boonsField.setText(pathBoons);
+    sorcDetailsField.setText("Add sorc info here");
+    gearField.setText(pcGearList.join(", "));
+
+    detailsField.setText(pcDescription);
+    featuresField.setText(pathFeatures);
+    sorcCircleField.setText(pcCircle);
+    armorField.setText("M. Save: " + miracleSave);
+
+    //heroDrop.select(heroOptions[1]); //set by default
+    
+    aSaveDrop.select(aSaveOptions[aSaveOption]);
+
+    healthField.setText(pcStrikes);
+    aspectsField.setText(pcStory);
+
+    potionsField.setText(
+        pcPotions.join('\n'),
+    );
+    scrollsField.setText(
+        pcScrolls.join('\n'),
+    );
+    weaponsField.setText("Add your own weapon");
+    pathField.setText(pcPath);
+    strikesField.setText(pcStrikes);
+
+    // Serialize the PDFDocument to bytes (a Uint8Array)
+    const pdfBytes = await pdfDoc.save();
+
+    // Trigger the browser to download the PDF document
+    download(pdfBytes, pcFirstName + " " + pcLastName, "application/pdf");
+};

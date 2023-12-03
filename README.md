@@ -70,6 +70,7 @@ These are things I'd like to do in the future, time permitting:
 + Convert the entire code to object based, with constructor templates.
 + Add an option to allow a different pdf (a community one I love).
 + Make a simple weapon generator following the guidlines in the book, and intelligently based on Path and Boons (maybe wealth too).
++ Fix the css overflow issue causing the initial page to scroll down.
 
 ## Known Issues
 If there are any major known issues, they will be posted below. 

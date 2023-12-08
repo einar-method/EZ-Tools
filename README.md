@@ -7,7 +7,7 @@ This simple web app is a tool for the [EZD6 RPG](https://www.ezd6.com/). DM Scot
 ## Documentation & Functionality
 Detailed below is everything you need to know about the tool as a user. 
 
-### Character Tolls (Main Tab)
+### Character Tools (Main Tab)
 By default, this is where the user starts. Just click on *RR Tools* if you want to switch!
 
 ### Everything! (Character Button)

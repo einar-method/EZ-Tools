@@ -60,6 +60,15 @@
                     class="tool-toggle">
                     <label for="rr-tools">RR Tools</label>
                 </p>
+                <p class="form-para">
+                    <input 
+                    type="radio" 
+                    name="tool-toggle" 
+                    id="dice-tools" 
+                    value="dice-tools"
+                    class="tool-toggle">
+                    <label for="dice-tools">Dice</label>
+                </p>
                 </fieldset>
             </div>
             
@@ -77,22 +86,7 @@
                     <button class="slide" id="scrolls">Scrolls</button>
                     <button class="slide" id="reset">Reset</button> 
                     <button class="slide" id="pdf-btn">To PDF</button>
-                    <div class="dice-box">
-                
-                          <p>
-                              <input 
-                              type="number" 
-                              name="die-input" 
-                              id="die-input" 
-                              min="2"
-                              max="100"
-                              placeholder="2-100"
-                              autocomplete="off">
-                          </p>
-                          <button id="dice-btn">Roll</button> 
-          
-                    </div> 
-                    
+                    <button class="slide" id="build-btn">Custom Build</button>
                     <div class="wrapper">
                       <div class="select-btn">
                         <span>Select a Path</span>
@@ -109,6 +103,11 @@
               
                 <div class="result-container" id="pc-content">
                   <h2><span id="name"></span></h2>
+
+                  <section class="🌠" id="builder">
+                    <p><span id="build-txt"></span></p>
+                    <hr>
+                  </section>
             
                   <section class="🌠" id="🔥">
                     <p ><strong>Path: </strong><span id="path"></span></p>
@@ -242,7 +241,39 @@
                   </section>
             
                 </div>
-              </div>
+            </div>
+
+            <div id="dice-tab" style="display:none">
+                <section class="button-wrapper">
+                  <div id="dice-btns">  
+              
+                    <button class="slide" id="d6-btn">D6</button>
+                    <button class="slide" id="boon-btn">Boon</button>
+                    <button class="slide" id="bane-btn">Bane</button>
+                    <div class="dice-box">
+                      <p>
+                          <input 
+                          type="text" 
+                          name="formula-input" 
+                          id="formula-input" 
+                          pattern="\d+d\d+(kl|kh|fr)?"
+                          title="Enter a valid dice formula, such as 2d20kh"
+                          placeholder="#d#"
+                          autocomplete="off">
+                      </p>
+                      <button id="formula-btn">Formula</button> 
+                    </div>
+                    <button class="slide" id="dice-reset">Clear</button>
+                  </div>
+                </section>
+            
+                <hr>
+              
+                <section class="dice-results">
+                  <dialog id="🎲🎲">Final Roll: <span id="final-roll"></span></dialog>
+                  <dialog id="🎲">All Rolls: <span id="all-roll"></span></dialog>
+                </section>
+            </div>
         </div>
 
     </section>

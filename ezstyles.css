@@ -143,7 +143,7 @@ fieldset {
   border: transparent; /* 1px solid rgba(0, 0, 0, 0.1); */
   border-radius: 3px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding-left: 5px;
   padding-right: 5px;
   box-sizing: border-box;
@@ -313,13 +313,13 @@ li.selected {
   margin-top: 0.5rem;
 }
 
-.🔮 {
+.🔮, .🎲 {
   display: none;
 }
-.🔮 p {
+.🔮 p, .🎲 p {
   margin: 0%;
 }
-.🔮 h4 {
+.🔮 h4, .🎲 h4 {
   margin-bottom: 0%;
   margin-top: 0.5rem;
 }
@@ -338,14 +338,7 @@ h2 {
   transition: all 0.8s ease-in-out;
 }
 
-#pc-btns {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.1rem;
-  grid-auto-rows: 6vmin;
-}
-
-#rr-btns {
+#pc-btns, #rr-btns, #dice-btns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.1rem;
@@ -390,9 +383,34 @@ a:any-link {
  grid-auto-rows: auto;
 }
 
+.dice-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .15rem;
+}
+
+#🎲🎲 {
+  grid-column: span 1;
+  position: relative;
+}
+#🎲 {
+  grid-column: span 2;
+  position: relative;
+}
+
+#🎲🎲, #🎲 {
+  width: 100%;
+  height: 100%;
+  opacity: 0; /* Start with opacity set to 0 */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  -webkit-transition: all 0.4s ease-in-out;
+  -moz-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+
 /* DICE INPUT FORM */
 .dice-box {
-  display: grid;
+  grid-column: span 2;
   background: black;
   margin: 0;
   padding: 0;
@@ -421,12 +439,16 @@ a:any-link {
   color: whitesmoke;
 }
 
-#dice-btn {
+#dice-btn, #formula-btn {
   background-color: #000;
   border: 0px;
   color: white;
   cursor: pointer;
   font-size: 2.8vmin;
+}
+
+#formula-btn {
+  grid-column: 2fr;
 }
 
 form p {

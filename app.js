@@ -2,6 +2,9 @@
 const possibleChoices = document.querySelectorAll('button')
 const displayName = document.getElementById('name')
 const innerPath = document.getElementById('path')
+const innerBuilder = document.getElementById('build-txt')
+const innerAllRolls = document.getElementById("all-roll");
+const innerFinalRoll = document.getElementById("final-roll");
 const innerSpecies = document.getElementById('species')
 const innerIncl = document.getElementById('inclinations')
 const displayBoons = document.getElementById('boons')
@@ -22,10 +25,12 @@ const pcResults = document.getElementById("🌠");
 const displayStory = document.getElementById("❤️");
 const displaySpecies = document.getElementById("🧝🏽");
 const displayPath = document.getElementById("🔥");
+const displayBuilder = document.getElementById("builder");
 const displayScrolls = document.getElementById("📜");
 const displayPotions = document.getElementById("⚗️");
 const displayIncl = document.getElementById("🤹🏽");
 const rrResults = document.getElementsByClassName("🔮");
+// const rollResults = document.getElementById("🎲");
 const rrTest = document.getElementsByClassName("real");
 const displayGear = document.getElementById("⚔️");
 
@@ -1242,6 +1247,17 @@ function getPotions() {
     innerPotions.innerHTML = pcPotions.join(', ');
 };
 
+function showBuilder() {
+    displayBuilder.style.display = "block";
+    innerBuilder.innerHTML = "This feature is currently in development. Please check back soon. Thank you for your understanding.";
+
+};
+
+function clearBuilder() {
+    displayBuilder.style.display = "none";
+    innerBuilder.innerHTML = ""
+}
+
 function rollAll() {
 
     getPath();
@@ -1409,34 +1425,46 @@ possibleChoices.forEach(possibleChoice => possibleChoice.addEventListener('click
     userChoice = e.target.id
     if (userChoice === "full") {
         rollAll();
-    }
+        clearBuilder(); //temp
+    };
     if (userChoice === "incli") {
         getInclinations();
-    }
+        clearBuilder(); //temp
+    };
     if (userChoice === "basics") {
         getBasics();
-    }
+        clearBuilder(); //temp
+    };
     if (userChoice === "just-gear") {
         getGear();  
+        clearBuilder(); //temp
     };
     if (userChoice === "reset") {
         reset();
-    }
+        clearBuilder(); //temp
+    };
     if (userChoice === "race-btn") {
         getPcSpecies();
+        clearBuilder(); //temp
     }
     if (userChoice === "path-btn") {
         getPath();
-    }
+        clearBuilder(); //temp
+    };
     if (userChoice === "potion") {
         getPotions();
-    }
+        clearBuilder(); //temp
+    };
     if (userChoice === "scrolls") {
         getScrolls();
-    }
+        clearBuilder(); //temp
+    };
+    if (userChoice === "build-btn") {
+        showBuilder();
+    };
     if (userChoice === "dice-btn") {
         rollDiceModal();
-    }
+    };
     console.log("User pressed btn: " + userChoice)
 }))
 
@@ -1484,7 +1512,125 @@ rrResetBtn.onclick = () => {
     document.querySelectorAll('.🔮').forEach(function(el) {
         el.style.display = 'none';
      });
-}; // 
+};
+
+/// WAY TOO MUCH CODE FOR A TRANSITION ///
+function dialogFade(element, opacity) {
+    element.style.opacity = opacity;
+    element.style.transition = "none"; // Disable transition temporarily
+    requestAnimationFrame(() => {
+      element.style.transition = ""; // Re-enable transition
+    });
+}
+  
+// Listen for the transitionend event on the first dialog
+document.getElementById("🎲🎲").addEventListener("transitionend", function () {
+    // Check if the opacity is set to 0 (indicating dialog is closing)
+    if (this.style.opacity === "0") {
+      // Perform actions after the transition (e.g., additional logic)
+      console.log("Dialogs are hidden");
+    } else {
+      // Perform actions after the transition (e.g., additional logic)
+      console.log("Dialogs are visible");
+    }
+});
+
+function clearDiceResults() {
+    document.getElementById("formula-input").value = "";
+    dialogFade(document.getElementById("🎲🎲"), 0)
+    dialogFade(document.getElementById("🎲"), 0)
+};
+
+function showDiceRoll(num, face, type) {
+    const die = { amount: num, face: face, type: type };
+    const rolls = [];
+
+    for (let i = 0; i < die.amount; i++) {
+        rolls.push(getRndInteger(1, die.face));
+    }
+
+    let finalRoll = 0;
+
+    if (die.type == "fr") {
+        finalRoll = rolls.reduce((sum, roll) => sum + roll, 0);
+        console.log("The final roll is:", finalRoll);
+    } else if (die.type == "kh") {
+        finalRoll = Math.max(...rolls);
+        console.log("With a boon, final roll is:", finalRoll);
+    } else if (die.type == "kl") {
+        finalRoll = Math.min(...rolls);
+        console.log("With a bane, final roll is:", finalRoll);
+    } else {
+        console.error("Invalid die type");
+    }
+
+    innerAllRolls.innerHTML = rolls.join(", ");
+    innerFinalRoll.innerHTML = finalRoll;
+    document.getElementById("🎲🎲").open = true;
+    document.getElementById("🎲").open = true;
+
+    // Below is needed to get the first transition to work
+    // There must be an easier way, have not figured it out yet
+    requestAnimationFrame(function () {
+        // Check the computed style to ensure the initial styles are applied
+        window.getComputedStyle(document.getElementById("🎲🎲")).opacity;
+        window.getComputedStyle(document.getElementById("🎲")).opacity;
+      
+        // Set opacity to 1 after the initial styles are applied
+        document.getElementById("🎲🎲").style.opacity = 1;
+        document.getElementById("🎲").style.opacity = 1;
+    });
+};
+
+document.getElementById("d6-btn").onclick = () => {
+    showDiceRoll(1, 6, "fr");
+};
+
+document.getElementById("boon-btn").onclick = () => {
+    showDiceRoll(2, 6, "kh");
+};
+
+document.getElementById("bane-btn").onclick = () => {
+    showDiceRoll(2, 6, "kl");
+};
+
+document.getElementById('formula-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission
+      document.getElementById('formula-btn').click(); // Programmatically click the button
+    }
+});
+
+document.getElementById("formula-btn").onclick = () => {
+    const form = document.getElementById('formula-input');
+    
+    if (!form.value) { 
+        alert("Please enter a dice formula, such as 2d20");    
+    } else if (form.value.length > 12) { 
+        alert("Entry too long or incorrect formula.");
+    } else {
+        const die = { amount: 1, face: 6, type: "fr" };
+
+        // Parse the input string to get amount, face, and type
+        const matches = form.value.match(/^(\d+)d(\d+)(kl|kh|fr)?$/);
+        
+        if (matches) {
+            die.amount = parseInt(matches[1], 10);
+            die.face = parseInt(matches[2], 10);
+            die.type = matches[3] || "fr";
+
+            console.log("Dice formula was accepted:", die);
+
+            showDiceRoll(die.amount, die.face, die.type)
+        } else {
+            alert("Incorrect formula format. Please use the format like '2d20', '4d4kh', '3d6kl', etc.");
+        }
+    }
+};
+
+document.getElementById("dice-reset").onclick = () => {
+    clearDiceResults();
+};
 
 /// PATH DROPDOWN MENU ///
 function addPath(selectedPath) {
@@ -1562,9 +1708,15 @@ function assignTab() {
     if (checkToggle() == "pc-tools") {
         document.getElementById("pc-tab").style.display = 'block';
         document.getElementById("rr-tab").style.display = 'none';
+        document.getElementById("dice-tab").style.display = 'none';
     } else if (checkToggle() == "rr-tools") {
         document.getElementById("rr-tab").style.display = 'block';
         document.getElementById("pc-tab").style.display = 'none';
+        document.getElementById("dice-tab").style.display = 'none';
+    } else if (checkToggle() == "dice-tools") {
+        document.getElementById("rr-tab").style.display = 'none';
+        document.getElementById("pc-tab").style.display = 'none';
+        document.getElementById("dice-tab").style.display = 'block';
     } else {
         alert("Sorry, there was an error getting a tab. Please refresh the page. ERROR CODE: 1409");
 }};

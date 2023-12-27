@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.js"></script>
-    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
     <link rel="stylesheet" href="ezstyles.css">
     <link rel="icon" href="Assets/eztoolslogo.png" type="image/x-icon">
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
     <title>EZ Tools</title>
 </head>
 <body>
+  <dialog id="error"><strong>Error:</strong> <span id="error-txt"></span></dialog>
+  <dialog id="tip"><strong></strong> <span id="tip-txt"></span></dialog>
     <section class="grid">
         <div class="card"></div> <!-- top left corner -->
         <div class="card">
@@ -25,11 +27,11 @@
         <div class="card"></div> <!-- bottom left side -->
         <div class="card"></div> <!-- bottom right side -->
         <div class="card">
-            <a href="#">Top</a> <!-- bottom left corner -->
+            <a class="footer-txt" href="#">Top</a> <!-- bottom left corner -->
         </div>
         <div class="card">
             <p class="footer-txt">
-                This tool was made by <a href="https://traveling-bard-games.itch.io/" target="_blank">Traveling Bard Games</a> using the amazing <a href="https://www.ezd6.com/" target="_blank">EZD6 Core</a> and the EZD6 Book of Quests. Check out the <a href="https://github.com/einar-method/EZ-Tools#ez-tools" target="_blank">Github repo</a> for Documentation & Support.
+                This tool was made by <a href="https://traveling-bard-games.itch.io/" target="_blank">E•M</a> using the amazing <a href="https://www.ezd6.com/" target="_blank">EZD6 Core</a> and Book of Quests. Check out the <a href="https://github.com/einar-method/EZ-Tools#ez-tools" target="_blank">Github repo</a> for Documentation & Support.
             </p>
         </div>
         <div class="card"></div> <!-- bottom right corner -->
@@ -67,27 +69,28 @@
                     id="dice-tools" 
                     value="dice-tools"
                     class="tool-toggle">
-                    <label for="dice-tools">Dice</label>
+                    <label for="dice-tools">Dice Tools</label>
                 </p>
                 </fieldset>
             </div>
             
             <div class="grid-box" id="pc-tab" style="display:block">
-                <section class="button-wrapper"> 
+                <section class="button-wrapper" id="all-PC-btns"> 
                   
                   <div id="pc-btns">
-                    <button class="slide" id="full">Everything!</button>
-                    <button class="slide" id="path-btn">Path</button>
-                    <button class="slide" id="race-btn">Species</button>
-                    <button class="slide" id="incli">Inclinations</button>
-                    <button class="slide" id="just-gear">Equipment</button>
-                    <button class="slide" id="basics">Basics</button>
-                    <button class="slide" id="potion">Potions</button>
-                    <button class="slide" id="scrolls">Scrolls</button>
-                    <button class="slide" id="reset">Reset</button> 
-                    <button class="slide" id="pdf-btn">To PDF</button>
-                    <button class="slide" id="build-btn">Custom Build</button>
-                    <div class="wrapper">
+                    <button class="glide-main" id="full-btn">Everything!</button>
+                    <button class="glide-main" id="path-btn">Path</button>
+                    <button class="glide-main" id="species-btn">Species</button>
+                    <button class="glide-main" id="inclinations-btn">Inclinations</button>
+                    <button class="glide-main" id="gear-btn">Equipment</button>
+                    <button class="glide-main" id="basics-btn">Basics</button>
+                    <button class="glide-main" id="potions-btn">Potions</button>
+                    <button class="glide-main" id="scrolls-btn">Scrolls</button>
+                    <button class="glide-main" id="reset-btn">Reset</button> 
+                    <button class="glide-main" id="pdf-btn">To PDF</button>
+                    <button class="glide-main" id="build-btn">Custom Build</button>
+                    <button class="glide-main" id="settings-btn">Settings</button>
+                    <!-- <div class="wrapper">
                       <div class="select-btn">
                         <span>Select a Path</span>
                         <i class="uil uil-angle-down"></i>
@@ -95,35 +98,212 @@
                       <div class="path-list">
                         <ul class="path-items"></ul>
                       </div>
-                    </div> 
+                    </div>  -->
                   </div>
                 </section>
                 
                 <hr>
+
+                <div class="📝-container" id="📝-container">
+                  <div class="📝builder-btns">
+                  <button class="glide-main" onclick="clearBuilder()" id="📝clearBuild-btn">Exit Builder</button>
+                  <button class="glide-main" onclick="fillForm()" id="📝pdf-btn">Save to PDF</button>
+                  </div>
+                  <hr>
+                  <p class="📝-class"><strong>Name:</strong></p>
+                  <div class="📝box">
+                    <p>
+                        <input 
+                        type="text" 
+                        name="📝name"
+                        id="📝name"
+                        class="📝form" 
+                        title="Enter a name or generate one"
+                        placeholder="PC Name"
+                        autocomplete="off">
+                    </p>
+                    <button class="form-btn" onclick="spinName(true)" id="📝name-btn">🎲</button> 
+                    <button class="form-btn" onclick="clearName()">🗙</button> 
+                  </div>
+                  <hr>
+                  <p class="📝-class"><strong>Path:</strong></p>
+                  <div class="📝box">
+                    <p class="green-box" id="📝path" ></p>
+                    <button class="form-btn" onclick="getPath(1)">🎲</button>
+                    <button class="form-btn" onclick="clearPath()">🗙</button>
+                    <div class="📝form-btns">
+                      <!-- I think we can put this in a javascript fun to listen all -->
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝warrior-btn">Warrior</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝warden-btn">Warden</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝delver-btn">Delver</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝brute-btn">Brute</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝rascal-btn">Rascal</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝conjur-btn">Conjurer</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝friar-btn">Friar</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝-skald-btn">Skald</button>
+                      <button class="glide-sml" onclick="getPath(2, this)" id="📝beast-btn">Beastmaster</button> 
+                    </div> 
+                  </div>
+                  <hr>
+                  <p class="📝-class"><strong>Species:</strong></p>
+                  <div class="📝box" >
+                    <p class="green-box" id="📝species"></p>
+                    <button class="form-btn" onclick="getPcSpecies(1)">🎲</button>
+                    <button class="form-btn" onclick="clearSpecies()">🗙</button>
+                    <div class="📝form-btns">
+                      <button class="glide-sml" onclick="getPcSpecies(2, this)">Human</button>
+                      <button class="glide-sml" onclick="getPcSpecies(2, this)">Elf</button>
+                      <button class="glide-sml" onclick="getPcSpecies(2, this)">Dwarf</button>
+                      <button class="glide-sml" onclick="getPcSpecies(2, this)">Hafling</button>
+                      <button class="glide-sml" onclick="getPcSpecies(2, this)">Goblin</button>
+                    </div> 
+                  </div>
+                  <hr>
+                  <p class="📝-class"><strong>Inclinations: </strong><span class="keep-span" id="📝inc-tip">2 of 2 remaining</span></p>
+                  <div class="📝box">
+                    <p class="green-box" id="📝inclinations"></p>
+                    <button class="form-btn" onclick="getInclinations(1)">🎲</button>
+                    <button class="form-btn" onclick="clearInclinations()">🗙</button> 
+                    <aside>
+                      <details>
+                          <summary>All Inclinations</summary>
+                    <div class="📝form-btns" id="📝inc-btns">
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Alchemist</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Attuned</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Hatred of the Unholy</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Born Blessed</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Catlike</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Check Mate</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Chirurgeon</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Craftperson</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Dandy</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Danger Sense</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Devout</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Faithful</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Familiar</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Fate Touched</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Fighter</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Hedge Wizard</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Inspiring</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Iron Will</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Lockpicking</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Marksman</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Nimbus of Light</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Slippery</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Sneaky</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Sticky Fingers</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Sweep or Swift Attack</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Thaumaturgy</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Tough Bastard</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Trapfinder</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Treasure Sense</button>
+                      <button class="glide-sml" onclick="getInclinations(2, this)">Victory in Failure</button>
+                    </div> 
+                  </details>
+                  </aside>
+                  </div>
+                  <hr>
+                  <p class="📝-class"><strong>Wealth:</strong></p>
+                  <div class="📝box">
+                    <p class="green-box" id="📝wealth"></p>
+                    <button class="form-btn" onclick="spinWealth(1)">🎲</button>
+                    <button class="form-btn" onclick="clearWealth()">🗙</button> 
+                    <div class="📝form-btns">
+                      <button class="glide-sml" onclick="spinWealth(2, this)">Pauper</button>
+                      <button class="glide-sml" onclick="spinWealth(2, this)">Cash Poor</button>
+                      <button class="glide-sml" onclick="spinWealth(2, this)">Moderate</button>
+                      <button class="glide-sml" onclick="spinWealth(2, this)">Wealthy</button>
+                      <button class="glide-sml" onclick="spinWealth(2, this)">Lordly</button>
+                      <button class="glide-sml" onclick="spinWealth(2, this)">Kingly</button>
+                    </div> 
+                  </div>
+                  <hr>
+                  <p class="📝-class"><strong>Strikes:</strong> <span id="📝strikes"></span></p>
+                  <p class="📝-class"><strong>Karma:</strong> <span id="📝karma"></span></p>
+                  <p class="📝-class"><strong>Armor Save:</strong> <span id="📝aSave"></span></p>
+                  <p class="📝-class"><strong>Miracle Save:</strong> <span id="📝mSave"></span></p>
+                  <p class="📝-class"><strong>Boons:</strong> <span id="📝boons"></span></p>
+                  <p class="📝-class"><strong>Armor Type:</strong> <span id="📝armor"></span></p>
+                  <p class="📝-class"><strong>Features:</strong> <span id="📝features"></span></p>
+                  <hr>
+
+                  <p class="📝-class"><strong>Equipment:</strong></p>
+                  <div class="📝box">
+                    <p class="green-box" id="📝gear"></p>
+                    <button class="form-btn" onclick="getGear(1)">🎲</button>
+                    <button class="form-btn" onclick="clearGear()">🗙</button>
+                  </div>
+                  <br>
+                  <p class="📝-class"><strong>Scrolls:</strong></p>
+                  <div class="📝box">
+                    <p class="green-box" id="📝scrolls"></p>
+                    <button class="form-btn" onclick="getScrolls(1)">🎲</button>
+                    <button class="form-btn" onclick="clearScrolls()">🗙</button>
+                  </div>
+                  <br>
+                  <p class="📝-class"><strong>Potions:</strong></p>
+                  <div class="📝box">
+                    <p class="green-box" id="📝potions"></p>
+                    <button class="form-btn" onclick="getPotions(1)">🎲</button>
+                    <button class="form-btn" onclick="clearPotions()">🗙</button>
+                  </div>
+                  <hr>
+
+                  <p class="📝-class"><strong>Story:</strong></p>
+                  <div class="📝box">
+                    <p>
+                      <input 
+                      type="text" 
+                      name="📝story"
+                      id="📝story"
+                      class="📝form" 
+                      title="Write a short backstory or generate one."
+                      placeholder="Backstory"
+                      autocomplete="off">
+                  </p>
+                    <button class="form-btn" onclick="getStory()">🎲</button>
+                    <button class="form-btn" onclick="clearStory()">🗙</button>
+                  </div>
+                  <br>
+                  <p class="📝-class"><strong>Description:</strong></p>
+                  <div class="📝box">
+                    <p>
+                      <input 
+                      type="text" 
+                      name="📝phys"
+                      id="📝phys"
+                      class="📝form" 
+                      title="Enter a description or generate one"
+                      placeholder="PC Description"
+                      autocomplete="off">
+                  </p>
+                    <button class="form-btn" onclick="getDescrip()">🎲</button>
+                    <button class="form-btn" onclick="clearDescrip()">🗙</button>
+                  </div>
+                  <hr>
+                  <div class="📝builder-btns">
+                    <button class="glide-main" onclick="clearBuilder()" id="📝clearBuild-btn">Exit Builder</button>
+                    <button class="glide-main" onclick="fillForm()" id="📝pdf-btn">Save to PDF</button>
+                  </div>
+                  <hr>
+              </div>
               
                 <div class="result-container" id="pc-content">
-                  <h2><span id="name"></span></h2>
-
-                  <section class="🌠" id="builder">
-                    <p><span id="build-txt"></span></p>
-                    <hr>
+                  <section class="🌠" id="nam">
+                    <h2><span id="name"></span></h2>
                   </section>
-            
                   <section class="🌠" id="🔥">
-                    <p ><strong>Path: </strong><span id="path"></span></p>
+                    <p ><strong>Path: </strong><span id="path"></span> <span id="circle"></span></p>
                     <p><strong>Boons: </strong><span id="boons"></span></p>
                     <p><strong>Features: </strong><span id="features"></span></p>
             
                     <hr>
             
+                    <p><strong>Strikes: </strong><span id="strikes"></span></p>
                     <p><strong>Armor Type: </strong><span id="armor"></span></p>
-                    <p><strong>Armor Save: </strong><span id="asave"></span></p>
-                    <p>
-                      <strong>Miraculous Save: </strong><span id="msave"></span>
-                    </p>
-                    
+                    <p><strong>Armor Save: </strong><span id="aSave"></span></p>
+                    <p><strong>Miracle Save: </strong><span id="mSave"></span></p>
                     <p><strong>Karma: </strong><span id="karma"></span></p>
-                    <p><strong>Wealth: </strong><span id="wealth"></span></p>
                     <hr>
                   </section>
             
@@ -133,29 +313,31 @@
                     </p>
                     <hr>
                   </section>
-            
-                  <section class="🌠" id="⚔️">
-                    <p>
-                      <strong>Gear: </strong><span id="gear"></span>
-                    </p>
-                  </section>
-                  
+
                   <section class="🌠" id="⚗️">
                     <p>
-                      <br>
-                      <strong>Potions: </strong><span id="potions"></span>
+                      <strong>Potions: </strong><span class="span" id="potions"></span>
                     </p>
+                    <br>
                   </section>
                 
                   <section class="🌠" id="📜">
                     <p>
-                      <br>
-                      <strong>Scrolls: </strong><span id="scroll-choice"></span>
+                      <strong>Scrolls: </strong><span id="scrolls"></span>
                     </p>
+                    <br>
+                  </section>
+            
+                  <section class="🌠" id="⚔️">
+                    <p><strong>Wealth: </strong><span id="wealth"></span></p>
+                    <br>
+                    <p>
+                      <strong>Gear: </strong><span id="gear"></span>
+                    </p>
+                    <hr>
                   </section>
             
                   <section class="🌠" id="🧝🏽">
-                    <hr>
                     <p><strong>Species: </strong><span id="species"></span></p>
                     <br>
                   </section>
@@ -170,7 +352,7 @@
                       <br>
             
                       <p>
-                        <strong>Physical Description:</strong><span id="phys"></span>
+                        <strong>Physical Description: </strong><span id="phys"></span>
                       </p>
                   </section>
                 </div>
@@ -180,15 +362,15 @@
                 <section class="button-wrapper">
                   <div id="rr-btns">  
               
-                    <button class="slide" id="rrAll-btn">Everything!</button>
-                    <button class="slide" id="monsters-btn">Monster</button>
-                    <button class="slide" id="lair-btn">Lair</button>
-                    <button class="slide" id="magicItem-btn">Magic Item</button>
-                    <button class="slide" id="treasure-btn">Treasure</button>
-                    <button class="slide" id="npc-btn">NPC</button>
-                    <button class="slide" id="twist-btn">Twists</button>
-                    <button class="slide" id="quest-btn">Quests</button>
-                    <button class="slide" id="rr-reset">Reset</button>
+                    <button class="glide-main" id="rrAll-btn">Everything!</button>
+                    <button class="glide-main" id="monsters-btn">Monster</button>
+                    <button class="glide-main" id="lair-btn">Lair</button>
+                    <button class="glide-main" id="magicItem-btn">Magic Item</button>
+                    <button class="glide-main" id="treasure-btn">Treasure</button>
+                    <button class="glide-main" id="npc-btn">NPC</button>
+                    <button class="glide-main" id="twist-btn">Twists</button>
+                    <button class="glide-main" id="quest-btn">Quests</button>
+                    <button class="glide-main" id="rr-reset">Reset</button>
                   </div>
                 </section>
             
@@ -247,15 +429,16 @@
                 <section class="button-wrapper">
                   <div id="dice-btns">  
               
-                    <button class="slide" id="d6-btn">D6</button>
-                    <button class="slide" id="boon-btn">Boon</button>
-                    <button class="slide" id="bane-btn">Bane</button>
+                    <button class="glide-main" id="d6-btn">D6</button>
+                    <button class="glide-main" id="boon-btn">Boon</button>
+                    <button class="glide-main" id="bane-btn">Bane</button>
                     <div class="dice-box">
                       <p>
                           <input 
                           type="text" 
                           name="formula-input" 
-                          id="formula-input" 
+                          id="formula-input"
+                          class="dice-input" 
                           pattern="\d+d\d+(kl|kh|fr)?"
                           title="Enter a valid dice formula, such as 2d20kh"
                           placeholder="#d#"
@@ -263,7 +446,7 @@
                       </p>
                       <button id="formula-btn">Formula</button> 
                     </div>
-                    <button class="slide" id="dice-reset">Clear</button>
+                    <button class="glide-main" id="dice-reset">Clear</button>
                   </div>
                 </section>
             
@@ -277,16 +460,6 @@
         </div>
 
     </section>
-
-    <!-- The Modal -->
-    <div id="dice-modal" class="modal">
-
-        <!-- Modal content -->
-        <div class="modal-content">
-            <p><span id="die-result"></span></p>
-        </div>
-  
-    </div>
 
     <script src="app.js"></script>
 </body>

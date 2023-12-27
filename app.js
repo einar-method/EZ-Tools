@@ -1,25 +1,7 @@
 /// DOCUMENT REFERENCE VARIABLES FOR PC ///
 const possibleChoices = document.querySelectorAll('button')
-const displayName = document.getElementById('name')
-const innerPath = document.getElementById('path')
-const innerBuilder = document.getElementById('build-txt')
 const innerAllRolls = document.getElementById("all-roll");
 const innerFinalRoll = document.getElementById("final-roll");
-const innerSpecies = document.getElementById('species')
-const innerIncl = document.getElementById('inclinations')
-const displayBoons = document.getElementById('boons')
-const displayFeatures = document.getElementById('features')
-const displayArmor = document.getElementById('armor')
-const displayASave = document.getElementById('asave')
-const displayMSave = document.getElementById('msave')
-const displayKarma = document.getElementById('karma')
-const displayWealth = document.getElementById('wealth')
-const innerGear = document.getElementById('gear')
-const innerStory = document.getElementById('story')
-const displayCore = document.getElementById('core')
-const displayDescription = document.getElementById('phys')
-const innerPotions = document.getElementById('potions')
-const innerScrolls = document.getElementById('scroll-choice')
 
 const pcResults = document.getElementById("🌠");
 const displayStory = document.getElementById("❤️");
@@ -46,11 +28,6 @@ const twist = document.getElementById("twists");
 const quest = document.getElementById("quests");
 
 /// BUTTON VARIABLES ///
-const wrapper = document.querySelector(".wrapper"),
-selectBtn = wrapper.querySelector(".select-btn"),
-searchInp = wrapper.querySelector("input"),
-options = wrapper.querySelector(".path-items");
-
 const rrAllBtn = document.getElementById("rrAll-btn");
 const lairBtn = document.getElementById("lair-btn");
 const monsterBtn = document.getElementById("monsters-btn");
@@ -77,35 +54,9 @@ const MAX_MODERATE = 75000;
 const MAX_POOR = 1000;
 
 /// PC VARIABLES CALLED IN VARIOUS FUNCTIONS ///
-let pcFirstName = "";
-let pcLastName = "";
-let userChoice
-let computerChoice
-let specialComputerChoice
-let result
-let gearChoice
-let scrollChoice
-let pcPath
-let pcCircle
-let pcCircleDetails = "Please look up you circle starting on pg. 35 in EZD6."
-let pcDescription
-let pcStory
-let pcSpecies
-let pcStrikes
-let woundsSave
+const pcList = [];
 let aSaveOption = 3; //for pdf
-let miracleSave
-let pcArmor
-let pathFeatures
-let pathBoons
-let karma
-let pcWealth
-let wealthTier = 0;
-let wealthDropFix = 0;
-let pcPotions = [];
-let pcInclinations = [];
-let pcGearList = [];
-let pcScrolls = [];
+let wealthDropFix = 0; // for pdf
 
 /// NPC VARIABLES ///
 let npcSpecies
@@ -293,17 +244,17 @@ const origins = [
 
 const heritages = [
     "animistic rituals", 
-    "delicious ale", 
+    "their delicious ale", 
     "absolutely nothing", 
     "a famous festival",
     "their sense of duty", 
     "a great temple", 
     "enduring a terrible tragedy", 
     "an important landmark",
-    "expert craftsmanship", 
+    "their expert craftsmanship", 
     "trade success", 
-    "unruly criminals", 
-    "devout belief", 
+    "being unruly criminals", 
+    "their devout belief", 
     "a deadly blood feud",
     "their fertile farmland", 
     "their unusual traditions", 
@@ -854,6 +805,46 @@ const magicName2 = [
 ];
 
 /// EASE OF USE FUNCTIONS
+function fadeInElements(elementIds) {
+    requestAnimationFrame(function () {
+        elementIds.forEach(function (elementId) {
+        // Check the computed style to ensure the initial styles are applied
+        window.getComputedStyle(document.getElementById(elementId)).opacity;
+  
+        // Set opacity to 1 after the initial styles are applied
+        document.getElementById(elementId).style.opacity = 1;
+      });
+    });
+};
+
+function callError(txt) {
+    document.getElementById("error-txt").innerHTML = txt;
+    document.getElementById("error").open = true;
+    fadeInElements(["error"])
+    setTimeout(() => {
+        document.getElementById("error").open = false;
+        dialogFade(document.getElementById("error"), 0)
+    }, 3000);
+};
+
+function callTip(txt) {
+    document.getElementById("tip-txt").innerHTML = txt;
+    document.getElementById("tip").open = true;
+    fadeInElements(["tip"])
+    setTimeout(() => {
+        document.getElementById("tip").open = false;
+        dialogFade(document.getElementById("tip"), 0)
+    }, 3000);
+};
+
+window.onload = () => {
+    setTimeout(() => {
+        const welcome = "Try out the new custom build tool!";
+        callTip(welcome);
+    }, 3000);
+};
+
+
 function randomMath(input) {
     return input[Math.floor(Math.random() * input.length)];
 }; // Great for picking a random element from an array.
@@ -866,6 +857,18 @@ function log(logEntry) {
     return console.log(logEntry);
 }; // Shorter log format.
 
+function getButtonText(button) {
+    return button.innerText;
+}
+
+function getSectionId(spanId) {
+    // Find the closest ancestor section element for the given spanId
+    const sectionElement = document.getElementById(spanId).closest('section');
+
+    // Return the ID of the section element
+    return sectionElement ? sectionElement.id : null;
+};
+
 function makingElements(variable, parentId) {
 
     // let newEle = document.createElement("strong");
@@ -877,29 +880,28 @@ function makingElements(variable, parentId) {
     parentId.innerHTML = variable;
 }; // Not currently used.
 
-/////// PC & NPC FUNCTION BUILDING BLOCKS /////
-function rollPath() {
-    pcPath = randomMath(pathsArray);
-    console.log(pcPath);
+function clearAll() {
+    // Get all span elements in the DOM
+    const spanElements = document.querySelectorAll('span:not(.keep-span)');
+  
+    // Loop through each span element and remove its innerHTML
+    for (let i = 0; i < spanElements.length; i++) {
+        const spanElement = spanElements[i];
+        spanElement.innerHTML = '';
+      }
 
-    // Set the dropdown to default and avoid errors
-    selectBtn.firstElementChild.innerText = "Select a Path";
-
-    if (pcPath === "Conjurer") {
-        pcCircle = randomMath(circlesArray);
-        console.log('magic circle is ' + pcCircle);
-
-        getScrolls();
-
-        return pcPath + ". Circle of Sorcery: " + pcCircle;
-    } else if (pcPath === "Skald") {
-        getScrolls();
-        return pcPath;
-    } else {
-        return pcPath;
+    // Clear input fields in forms
+    const formInputElements = document.querySelectorAll('.📝form');
+    for (let j = 0; j < formInputElements.length; j++) {
+        const formInputElement = formInputElements[j];
+        // Check if the input element is not a button or checkbox (adjust as needed)
+        if (formInputElement.type !== 'button' && formInputElement.type !== 'checkbox') {
+        formInputElement.value = '';
+        }
     }
 };
 
+/////// PC & NPC FUNCTION BUILDING BLOCKS /////
 function rollSpecies() {
     return randomMath(speciesArray);
 };
@@ -908,153 +910,59 @@ function rollNpcSpecies() {
     return randomMath(npcSpeciesArray);
 };
 
-function showStats() {
-    if (pcPath === "Brute") {
-        pcStrikes = "5"
-    } else {
-        pcStrikes = "3"
-    }
-    console.log(pcStrikes)
-    
-    /// ### Path Specific Tasks ###
-    if (pcPath === "Warrior") {
-        aSaveOption = 1; //for pdf
-        woundsSave = "3+";
-        miracleSave = "6";
-        pcArmor = "Heavy"
-        pathBoons = "Melee, Strength Tasks"
-        pathFeatures = "Shield Sacrifice, Brutal Strikes, Dual Weapons, Armor save 4+ w/o shield"
-    } else if (pcPath === "Warden") {
-        aSaveOption = 3; //for pdf
-        woundsSave = "5+"
-        miracleSave = "6"
-        pcArmor = "Medium"
-        pathBoons = "Ranged Weapons, Wilderness Tasks"
-        pathFeatures = "Trailfinder, Forager"
-    } else if (pcPath === "Delver") {
-        aSaveOption = 3; //for pdf  
-        woundsSave = "5+"
-        miracleSave = "6"
-        pcArmor = "Medium"
-        pathBoons = "Melee OR Ranged Weapons, Spelunking Tasks"
-        pathFeatures = "Gear, Jack"
-    } else if (pcPath === "Brute") {  
-        aSaveOption = 4; //for pdf
-        woundsSave = "6"
-        miracleSave = "6"
-        pcArmor = "Light"
-        pathBoons = "Melee, Strength Tasks"
-        pathFeatures = "Enrage, Superstitious"
-    } else if (pcPath === "Rascal") {  
-        aSaveOption = 4; //for pdf
-        woundsSave = "6 with a boon"
-        miracleSave = "6 with a boon"
-        pcArmor = "Light"
-        pathBoons = "Acrobatic Tasks"
-        pathFeatures = "Tricks, Gank, Boon to Armor & Miracle saves"
-    } else if (pcPath === "Conjurer") {  
-        aSaveOption = 4; //for pdf
-        woundsSave = "6"
-        miracleSave = "6"
-        pcArmor = "Light"
-        pathBoons = "Magickal Mystery Tasks"
-        pathFeatures = "Mystic Barrier, Master of Magick, Wand or Staff"
-        if (pcPath === "Conjurer") {
-            pcCircle = randomMath(circlesArray);
-            console.log('magic circle is ' + pcCircle)
-            innerPath.innerHTML = pcPath + ". Circle of Sorcery: " + pcCircle;
-        } 
-    } else if (pcPath === "Friar") { 
-        aSaveOption = 3; //for pdf 
-        woundsSave = "5+"
-        miracleSave = "5+"
-        pcArmor = "Medium"
-        pathBoons = "Resist Heritical Powers (magick), Religious Knowledge"
-        pathFeatures = "Empathic Healing, Holy Light"
-    } else if (pcPath === "Skald") {  
-        aSaveOption = 3; //for pdf
-        woundsSave = "5+"
-        miracleSave = "5+"
-        pcArmor = "Medium"
-        pathBoons = "Lore Tasks, Performance Tasks"
-        pathFeatures = "Scrollmaster, Traveler, Strands of Fate"
-    } else {
-        aSaveOption = 3; //for pdf
-        woundsSave = "5+"
-        miracleSave = "6"
-        pcArmor = "Medium"
-        pathBoons = "Melee OR Ranged Weapons, Beast Empathy"
-        pathFeatures = "Beastspeech, Beast Aid, Beast Friend"
-    }
-    
-    console.log("Wounds save: " + woundsSave)
-    console.log("Miracle save: " + miracleSave)
-    console.log("PC Armor: " + pcArmor)
-    console.log(pathBoons)
-    console.log(pathFeatures)
-    
-    displayBoons.innerHTML = pathBoons;
-    displayFeatures.innerHTML = pathFeatures;
-    displayArmor.innerHTML = pcArmor;
-    displayASave.innerHTML = woundsSave;
-    displayMSave.innerHTML = miracleSave;
-};
-
-function rollInclination() {
-
-    pcInclinations = []; // Clear out any existing Incl first.
-
-    let allowedIncl = 2;
-
-    if (pcPath === "Delver" && pcSpecies === "Human") {
-        allowedIncl = 4;
-    } else if (pcSpecies === "Human" || pcPath === "Delver") {
-        allowedIncl = 3;
-    }; // Path and species determines number of Incl rolls.
-
-    for (let i = 0; i < allowedIncl; i++) {
-        let tempIncl = randomMath(inclinationsArray);
-        if (!pcInclinations.includes(tempIncl)) {
-            // Only runs if value not already in array
-            pcInclinations.push(tempIncl);
-            console.log(tempIncl);
-        } else {
-            console.log(tempIncl + " was a duplicate.");
-            rollInclination(); // Restart to avoid duplicates.
-        }
-    };
-
-    console.log(pcInclinations.join(", "));
-    showKarma(); // Karma total is based off Inclinations.
-    return pcInclinations.join(", ");
-};
-
-function showKarma() {
-    if (pcInclinations.includes("Born Blessed")) {
-        karma = "6";
-    } else {
-        karma = "3";
-    }
-    console.log(karma);
-    displayKarma.innerHTML = karma;
-};
-
 function tbgFirstNames() {
     return randomMath(namesPrefix) + randomMath(namesRoot);
 };
 
-function rollName() {
-    pcFirstName = randomMath(firstNames);
-    
-    pcLastName = 
+function spinName(checker) {
+    const form = document.getElementById("📝name");
+
+    if (checker || !form.value) {
+        //we want to generate name
+        pcList[0].getName(1);  
+    } else if (!checker) {
+        // we want form value
+        if (form.value.length < 35){
+            const output = form.value;
+            pcList[0].getName(1, output);
+        } else  {
+            const erMsg = "Please pick a shorter name.";
+            callError(erMsg);
+        }
+    }
+}
+
+document.getElementById("📝name").addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission
+      spinName(false)
+      //document.getElementById("📝name-btn").click(); // Programmatically click the button
+    }
+});
+document.getElementById("📝story").addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission
+      getStory(false)
+    }
+});
+document.getElementById("📝phys").addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default form submission
+      getDescrip(false)
+    }
+});
+
+function rollName(checker) {
+    const first = randomMath(firstNames);
+    const last = 
         randomMath(namesPrefix) + 
         randomMath(namesRoot) + 
         randomMath(namesSuffix)
     ;
-    console.log(pcFirstName)
-    console.log(pcLastName)
-
-    return pcFirstName + " " + pcLastName;
+    if (checker == 0) {
+        return first + " " + last;
+    } else { return { first, last, }; }
+    
 };
 
 function rollAppearnace() {
@@ -1095,170 +1003,254 @@ function rollNpcAppearnace() {
         + bodyHeight + " with a " + bodyVoice + " voice.";
 };
 
-function rollGear() {
-    pcGearList = [];
-
-    for (let i = 0; i < wealthTier * 3; i++) {
-        pcGearList.push(randomMath(gearArray));
-    }
-    console.log(pcGearList.join(", "));
-    return pcGearList.join(", ");
-};
-
 function rollStory() {
     /// Generate Profession
-    let background = randomMath(backgrounds);
-    console.log(background);
+    const background = ". Before I became a hero, I worked as a " + randomMath(backgrounds);
 
     /// Generate Origin
-    let origin = randomMath(origins);
-    console.log(origin);
+    const origin = "I'm from " + randomMath(origins);
 
     /// Generate Heritage
-    let heritage = randomMath(heritages);
-    console.log(heritage)
+    const heritage = " where my people are known for " + randomMath(heritages);
 
-    return "I'm from " + origin + " where my people are known for " + heritage + "." +
-    " Before I became a hero, I worked as a " + background + ".";
+    return origin + heritage + background + ".";
 };
 
 function rollCore() {
     /// Generate Moral Core (might help inform aspects)
-    let belief = randomMath(beliefs);
+    const belief = "Belief: " + randomMath(beliefs);
     console.log(belief);
 
-    let flaw = randomMath(flaws);
+    const flaw = "Flaw: " + randomMath(flaws);
     console.log(flaw);
 
-    let oath = randomMath(oaths);
+    const oath = "Oath: " + randomMath(oaths);
     console.log(oath);
 
-    return "Belief: " + belief + "." + " Flaw: " + flaw + "." + " Oath: " + oath;
+    return  belief + ". " + flaw + ". " + oath;
+};
+
+function spinWealth(checker, btn) {
+    pcList[0].getWealth(checker, btn)
 }
 
-function rollWealth() {
+function clearWealth() {
+    pcList[0].wealth = null;
+    pcList[0].wealthTier = 0;
+    document.getElementById("📝wealth").innerHTML = "";
+    pcList[0].updateStats();
+}
+
+function rollWealth(checker, btn) {
     //PLEASE NOTE: I'm not the creator of the fillable pdf being used. The original creator made an error in naming convention for the wealth radio group. The variable "wealthDropFix" exists in this code solely for the purpose of addresssing this issue. Namely, cash poor and moderate have to be manually swapped. If we can modify the radio data before use, or if we supply a better form, wealthDropFix can be removed. BE SURE TO CHECK THE PDF FUNCTION.
+    let wealth = "";
+    let wealthTier = "";
+    let tempWealth;
 
-    let tempWealth = getRndInteger(1, 100000);
+    if (btn == null) { tempWealth = getRndInteger(1, 100000); }
+    
 
-    if (tempWealth < MAX_POOR) {
-        pcWealth = "Pauper";
+    if (tempWealth < MAX_POOR || btn == "Pauper") {
+        wealth = "Pauper";
         wealthTier = 1;
         wealthDropFix = 0;
-    } else if (tempWealth < MAX_MODERATE) {
-        pcWealth = "Cash Poor";
+    } else if (tempWealth < MAX_MODERATE || btn == "Cash Poor") {
+        wealth = "Cash Poor";
         wealthTier = 2;
         wealthDropFix = 2;
-    } else if (tempWealth < MAX_WEALTHY) {
-        pcWealth = "Moderate";
+    } else if (tempWealth < MAX_WEALTHY || btn == "Moderate") {
+        wealth = "Moderate";
         wealthTier = 3;
         wealthDropFix = 1;
-    } else if (tempWealth < MAX_LORDLY) {
-        pcWealth = "Wealthy";
+    } else if (tempWealth < MAX_LORDLY || btn == "Wealthy") {
+        wealth = "Wealthy";
         wealthTier = 4;
         wealthDropFix = 3;
-    } else if (tempWealth < MAX_KINGLY) {
-        pcWealth = "Lordly";
+    } else if (tempWealth < MAX_KINGLY || btn == "Lordly") {
+        wealth = "Lordly";
         wealthTier = 5;
         wealthDropFix = 4;
-    } else if (tempWealth === MAX_KINGLY) {
-        pcWealth = "Kingly";
+    } else if (tempWealth === MAX_KINGLY || btn ==  "Kingly") {
+        wealth = "Kingly";
         wealthTier = 6;
         wealthDropFix = 5;
     } else {
-        pcWealth = "Sorry, there was an error"
+        wealth = "Sorry, there was an error"
     }
-    console.log(pcWealth)
-    return pcWealth;
+    console.log(wealth)
+    if (checker == 0) { // for npcs
+        wealthDropFix = 0;
+        return wealth;
+    } else if (checker == 2) {
+        return wealthTier;
+    } else { return { wealth, wealthTier }; }
 };
 
 function getBasics() {
     displayStory.style.display = "block";
-    displayName.innerHTML = rollName();
-    pcStory = rollStory();
-    innerStory.innerHTML = pcStory;
-    displayCore.innerHTML = rollCore();
-    pcDescription = rollAppearnace();
-    displayDescription.innerHTML = pcDescription;
-    displayWealth.innerHTML = rollWealth();
-};
+    pcList[0].getName();
+    getStory(true);
+    pcList[0].getCore();
+    pcList[0].getBody();
+    pcList[0].getWealth();
 
-function getPcSpecies() {
-    pcSpecies = rollSpecies();
-    displaySpecies.style.display = "block";
-    innerSpecies.innerHTML = pcSpecies;
-};
-
-function getInclinations() {
-    displayIncl.style.display = "block"
-    innerIncl.innerHTML = rollInclination();
-};
-
-function getGear() {
-    displayGear.style.display = "block";
-    if (wealthTier <= 0) {
-        displayWealth.innerHTML = rollWealth();
-        innerGear.innerHTML = rollGear();
-    } else if (wealthTier > 0) {
-        innerGear.innerHTML = rollGear();
-    } else {
-        console.log("there was an error getting gear.")
-    }; 
-};
-
-function getPath() {
-    displayPath.style.display = "block"
-    innerPath.innerHTML = rollPath();
-    showStats();
-};
-
-function getScrolls() {
-    displayScrolls.style.display = "block";
-    pcScrolls = [];
-
-    pcScrolls.push(randomMath(scrollsArray));
-    pcScrolls.push(randomMath(scrollsArray));
-    console.log(pcScrolls);
-
-    innerScrolls.innerHTML = pcScrolls.join(', ');
-    console.log(pcScrolls.join(', '));
     
 };
 
-function rollOnePotion() {
-    return randomMath(potionsArray);
+function getPcSpecies(checker, btn) {
+    pcList[0].getSpecies(checker, btn);
 };
 
-function rollOneScroll() {
-    return randomMath(scrollsArray);
+function clearSpecies() {
+    pcList[0].species = null;
+    document.getElementById("📝species").innerHTML = "";
+    pcList[0].updateStats();
+}
+
+function getInclinations(checker, btn) {
+    pcList[0].getInclinations(checker, btn);
 };
 
-function getPotions() {
-    displayPotions.style.display = "block";
-    console.log(pcPotions);
+function clearInclinations() {
+    pcList[0].inclinations = [];
+    pcList[0].updateStats();
+    document.getElementById("📝inclinations").innerHTML = "";
+    document.getElementById("📝karma").innerHTML = "";
+};
 
-    pcPotions = [];
+function getPath(checker, btn) {
+    //selectBtn.firstElementChild.innerText = "Select a Path";
+    pcList[0].getPath(checker, btn);
+};
 
-    pcPotions.push(randomMath(potionsArray));
-    pcPotions.push(randomMath(potionsArray));
+function clearPath() {
+    pcList[0].path = null;
+    pcList[0].circle = null;
+    pcList[0].circleTxt = null;
+    pcList[0].updateStats();
+    document.getElementById("📝path").innerHTML = "";
+    document.getElementById("📝boons").innerHTML = "";
+    document.getElementById("📝features").innerHTML = "";
+    document.getElementById("📝strikes").innerHTML = "";
+    document.getElementById("📝armor").innerHTML = "";
+    document.getElementById("📝aSave").innerHTML = "";
+    document.getElementById("📝mSave").innerHTML = "";
+    document.getElementById("📝scrolls").innerHTML = "";
+    document.getElementById("📝potions").innerHTML = "";
+}
 
-    console.log(pcPotions);
+function clearName() {
+    pcList[0].name = null;
+    document.getElementById("📝name").value = "";
+    pcList[0].updateStats();
+};
 
-    innerPotions.innerHTML = pcPotions.join(', ');
+function getGear(checker) {
+    pcList[0].getGear(checker);
+};
+
+function clearGear() {
+    pcList[0].equipment = [];
+    document.getElementById("📝gear").innerHTML = "";
+    pcList[0].updateStats();
+};
+
+function getScrolls(checker) {
+    pcList[0].getScrolls(checker);
+};
+
+function clearScrolls() {
+    pcList[0].scrolls = [];
+    document.getElementById("📝scrolls").innerHTML = "";
+    pcList[0].updateStats();
+};
+
+function getPotions(checker) {
+    if (checker == 0) {
+        return randomMath(potionsArray);
+    } else { pcList[0].getPotions(checker); }
+};
+
+function clearPotions() {
+    pcList[0].potions = [];
+    document.getElementById("📝potions").innerHTML = "";
+    pcList[0].updateStats();
+};
+
+function getDescrip(checker) {
+    const form = document.getElementById("📝phys");
+    if (checker || !form.value) {
+        //we want to generate name
+        pcList[0].getBody(1);
+    } else if (!checker) {
+        // we want form value
+        if (form.value.length < 100){
+            const output = form.value;
+            pcList[0].getBody(1, output);
+        } else  {
+            const erMsg = "Please write a shorter description.";
+            callError(erMsg);
+        }
+    }
+};
+
+function clearDescrip() {
+    pcList[0].description = null;
+    document.getElementById("📝phys").value = "";
+    pcList[0].updateStats();
+};
+
+function getCore() {
+    pcList[0].getCore();
+};
+
+function clearCore() {
+    pcList[0].core = null;
+    document.getElementById("📝core").value = "";
+    pcList[0].updateStats();
+};
+
+function getStory(checker) {
+    const storyForm = document.getElementById("📝story");
+
+    if (checker || !storyForm.value) {
+        //we want to generate name
+        pcList[0].getStory(1);
+    } else if (!checker) {
+        // we want storyForm value
+        if (storyForm.value.length < 100){
+            const output = storyForm.value;
+            pcList[0].getStory(1, output);
+        } else {
+            const erMsg = "Please write a shorter backstory.";
+            callError(erMsg);
+        }
+    }
+};
+
+function clearStory() {
+    pcList[0].story = null;
+    document.getElementById("📝story").value = "";
+    pcList[0].updateStats();
 };
 
 function showBuilder() {
-    displayBuilder.style.display = "block";
-    innerBuilder.innerHTML = "This feature is currently in development. Please check back soon. Thank you for your understanding.";
-
+    reset()
+    document.getElementById("📝-container").style.display = "block";
+    document.getElementById("all-PC-btns").style.display = "none";
+    pcList[0].setBuilder();
 };
 
 function clearBuilder() {
-    displayBuilder.style.display = "none";
-    innerBuilder.innerHTML = ""
-}
+    reset();
+    document.getElementById("📝-container").style.display = "none";
+    document.getElementById("all-PC-btns").style.display = "block";
+    pcList[0].setGenTool();
+};
 
 function rollAll() {
+
+    reset();
 
     getPath();
     
@@ -1270,7 +1262,7 @@ function rollAll() {
 
     getGear();
     
-    selectBtn.firstElementChild.innerText = "Select a Path";
+    //selectBtn.firstElementChild.innerText = "Select a Path";
 };
 
 /// RR FUNCTIONS ///
@@ -1317,7 +1309,7 @@ function rollTreasure() {
 
 function rollNPC() {
     // Make name
-    let npcName = rollName();
+    let npcName = rollName(0);
 
     // Generate species
     let npcSpecies = rollNpcSpecies();
@@ -1338,7 +1330,7 @@ function rollNPC() {
     console.log(npcAction);
 
     let npcInfo = npcName + " is a" + npcSpecies + ". " + npcAppearance + " Thier purpose is to " + npc_purpose + ". " + "If this is a common NPC, they " + npcWant + "." +
-    " If this is a powerful NPC, they " + npcAction + ". " + "Their wealth level is " + rollWealth() + ".";
+    " If this is a powerful NPC, they " + npcAction + ". " + "Their wealth level is " + rollWealth(0) + ".";
 
     npc.parentElement.style.display = "block";
     npc.innerHTML = npcInfo;
@@ -1361,111 +1353,53 @@ function rollQuest() {
     quest.innerHTML = twistReturn;
 };
 
-
-/// DICE MODAL ///
-const dice = document.getElementById("die-result");
-
-function rollDiceModal() {
-
-    diceModal.style.display = "block";
-
-    const die = {face:"6"};
-    console.log(die);
-    const form = document.getElementById('die-input');
-    console.log(form.value);
-
-    if (form.value < 2) { // Ensures no blank, 0, 1, or neg values.
- 
-        console.log("entry too low")
-
-        setTimeout(function(){
-            dice.innerHTML = getRndInteger(1, 6);
-        }, 800); 
-          
-    } else if (form.value > 100) { // Ensures nothing over 100.
-  
-        dieSize = 100;
-        console.log("entry too high or not a num")
-  
-        dice.innerHTML = getRndInteger(1, form.value);
-    } else {
-
-        die.face = form.value;
-          
-        console.log("entry was accepted")
-
-        setTimeout(function(){
-            dice.innerHTML = getRndInteger(1, form.value);
-        }, 800); 
-    }
-
-    setTimeout(function(){
-        closeModal();
-    }, 1800); 
-
-    dice.innerHTML = "·";  
-}
-
-// When the user clicks anywhere outside of the modal, close it
-// window.onclick = function(event) {
-//     if (event.target == diceModal) {
-//         setTimeout(function(){
-//             console.log("Executed after 1 second");
-//             closeModal();
-//         }, 500);   
-//     }
-// };
-
-function closeModal() {
-    diceModal.style.display = "none";
-}; // Hides the dice modal
-
 /// BUTTON FUNCTIONS ///
 possibleChoices.forEach(possibleChoice => possibleChoice.addEventListener('click', (e) => {
     userChoice = e.target.id
-    if (userChoice === "full") {
+    if (userChoice === "full-btn") {
         rollAll();
-        clearBuilder(); //temp
     };
-    if (userChoice === "incli") {
+    if (userChoice === "inclinations-btn") {
         getInclinations();
-        clearBuilder(); //temp
     };
-    if (userChoice === "basics") {
+    if (userChoice === "basics-btn") {
         getBasics();
-        clearBuilder(); //temp
     };
-    if (userChoice === "just-gear") {
+    if (userChoice === "gear-btn") {
         getGear();  
-        clearBuilder(); //temp
     };
-    if (userChoice === "reset") {
+    if (userChoice === "reset-btn") {
         reset();
-        clearBuilder(); //temp
     };
-    if (userChoice === "race-btn") {
+    if (userChoice === "species-btn") {
         getPcSpecies();
-        clearBuilder(); //temp
     }
     if (userChoice === "path-btn") {
         getPath();
-        clearBuilder(); //temp
     };
-    if (userChoice === "potion") {
+    if (userChoice === "potions-btn") {
         getPotions();
-        clearBuilder(); //temp
     };
-    if (userChoice === "scrolls") {
+    if (userChoice === "scrolls-btn") {
         getScrolls();
-        clearBuilder(); //temp
     };
     if (userChoice === "build-btn") {
         showBuilder();
     };
-    if (userChoice === "dice-btn") {
-        rollDiceModal();
+    if (userChoice === "settings-btn") {
+        const soon = "Coming soon for Settings:"
+        const soon1 = "Choose your preferred pdf."
+        const soon2 = "Or disable pesky tips and sounds"
+        callTip(soon);
+        setTimeout(() => {
+            callTip(soon1)
+        }, 3500);
+        setTimeout(() => {
+            callTip(soon2)
+        }, 7000);
+
     };
-    console.log("User pressed btn: " + userChoice)
+    console.log("User pressed btn:", getButtonText(e.target), "-ID:", userChoice)
 }))
 
 
@@ -1511,7 +1445,7 @@ questBtn.onclick = () => {
 rrResetBtn.onclick = () => {
     document.querySelectorAll('.🔮').forEach(function(el) {
         el.style.display = 'none';
-     });
+    });
 };
 
 /// WAY TOO MUCH CODE FOR A TRANSITION ///
@@ -1521,19 +1455,7 @@ function dialogFade(element, opacity) {
     requestAnimationFrame(() => {
       element.style.transition = ""; // Re-enable transition
     });
-}
-  
-// Listen for the transitionend event on the first dialog
-document.getElementById("🎲🎲").addEventListener("transitionend", function () {
-    // Check if the opacity is set to 0 (indicating dialog is closing)
-    if (this.style.opacity === "0") {
-      // Perform actions after the transition (e.g., additional logic)
-      console.log("Dialogs are hidden");
-    } else {
-      // Perform actions after the transition (e.g., additional logic)
-      console.log("Dialogs are visible");
-    }
-});
+};
 
 function clearDiceResults() {
     document.getElementById("formula-input").value = "";
@@ -1571,15 +1493,7 @@ function showDiceRoll(num, face, type) {
 
     // Below is needed to get the first transition to work
     // There must be an easier way, have not figured it out yet
-    requestAnimationFrame(function () {
-        // Check the computed style to ensure the initial styles are applied
-        window.getComputedStyle(document.getElementById("🎲🎲")).opacity;
-        window.getComputedStyle(document.getElementById("🎲")).opacity;
-      
-        // Set opacity to 1 after the initial styles are applied
-        document.getElementById("🎲🎲").style.opacity = 1;
-        document.getElementById("🎲").style.opacity = 1;
-    });
+    fadeInElements(["🎲", "🎲🎲"])
 };
 
 document.getElementById("d6-btn").onclick = () => {
@@ -1622,8 +1536,12 @@ document.getElementById("formula-btn").onclick = () => {
             console.log("Dice formula was accepted:", die);
 
             showDiceRoll(die.amount, die.face, die.type)
+
+            const buttonAudio = new Audio("Assets/dice.mp3");
+            buttonAudio.volume = 0.2;
+            buttonAudio.play();
         } else {
-            alert("Incorrect formula format. Please use the format like '2d20', '4d4kh', '3d6kl', etc.");
+            alert("Incorrect formula format. Please use a format like '2d20', '4d4kh', '3d6kl', etc.");
         }
     }
 };
@@ -1632,65 +1550,22 @@ document.getElementById("dice-reset").onclick = () => {
     clearDiceResults();
 };
 
-/// PATH DROPDOWN MENU ///
-function addPath(selectedPath) {
-    options.innerHTML = "";
-    pathsArray.forEach(path => {
-        let isSelected = path == selectedPath ? "selected" : "";
-        let li = `<li onclick="updateName(this)" class="${isSelected}">${path}</li>`;
-        options.insertAdjacentHTML("beforeend", li);
-    });
-}
-addPath();
-
-function updateName(selectedLi) {
-    addPath(selectedLi.innerText);
-    wrapper.classList.remove("active");
-    selectBtn.firstElementChild.innerText = selectedLi.innerText;
-    pcPath = selectedLi.innerText;
-    displayPath.style.display = "block";
-    innerPath.innerHTML = pcPath;
-    showStats();
-}
-
-selectBtn.addEventListener("click", () => wrapper.classList.toggle("active"));
-
 /// PC Reset ///
 function reset() {
-    selectBtn.firstElementChild.innerText = "Select a Path";
+    //selectBtn.firstElementChild.innerText = "Select a Path";
     document.querySelectorAll('.🌠').forEach(function(el) {
         el.style.display = 'none';
-     });
-    pcPath = '';
-    pcCircle = '';
-    pcSpecies = '';
-    pcStrikes = '';
-    woundsSave = '';
-    miracleSave = '';
-    pcArmor = '';
-    pathFeatures = '';
-    pathBoons = '';
-    karma = '';
-    pcDescription = "";
-    pcStory = "";
-    innerPath.innerHTML = '';
-    displayName.innerHTML = '';
-    innerSpecies.innerHTML = '';
-    innerIncl.innerHTML = '';
-    displayBoons.innerHTML = '';
-    displayFeatures.innerHTML = '';
-    displayArmor.innerHTML = '';
-    displayASave.innerHTML = '';
-    displayMSave.innerHTML = '';
-    displayKarma.innerHTML = '';
-    displayWealth.innerHTML = '';
-    innerGear.innerHTML = '';
-    innerStory.innerHTML = '';
-    displayCore.innerHTML = '';
-    displayDescription.innerHTML = ''; 
-    innerPotions.innerHTML = '';   
-    innerScrolls.innerHTML = ''; 
-}; // This function is old and may need to be updated.
+    });
+    document.querySelectorAll(".green-box").forEach(function(el) {
+        //console.log(el)
+        el.innerHTML = "";
+    });
+    //document.getElementById("📝name").value = "";
+    pcList[0].resetToDefault(); 
+    //document.getElementById("circle").innerHTML = ""
+
+    clearAll(); // some fields are just too stubborn
+};
 
 /// SWITCH BETWEEN TOOL TABS ///
 tabToggle.onclick = () => {
@@ -1728,21 +1603,21 @@ assignTab();
 const buttons = document.querySelectorAll("button");
 
 buttons.forEach (button => {
+    // Check if the button id is "formula-input"
+    if (button.id === "formula-input") {
+        // return without playing audio
+        return;
+    }
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
         // Timothy Huang wrote this code to check for mobile.
-      }else{
+    } else {
         button.addEventListener("click", () => {
-            if (button.id != "dice-btn") {
-                const buttonAudio = new Audio ("Assets/click.mp3");
-                buttonAudio.volume = 0.1;
-                buttonAudio.play();
-            } else {
-                const buttonAudio = new Audio ("Assets/dice.mp3");
-                buttonAudio.volume = 0.2;
-                buttonAudio.play();
-            }
+            const allowedIDs = ["d6-btn", "boon-btn", "bane-btn"];
+            const buttonAudio = new Audio("Assets/" + (allowedIDs.includes(button.id) ? "dice.mp3" : "click.mp3"));
+            buttonAudio.volume = allowedIDs.includes(button.id) ? 0.2 : 0.1;
+            buttonAudio.play();
         });
-      }
+    }
 });
 
 ///// PDF Stuff /////
@@ -1750,9 +1625,18 @@ const { degrees, PDFDocument, rgb, StandardFonts, PDFTextField, PDFRadioGroup, P
 
 const btn = document.querySelector('#fillForm');
 
-pdfBtn.addEventListener("click", fillForm);
-
-let finalPCName = "Xamara Temp";
+// pdfBtn.addEventListener("click", fillForm);
+pdfBtn.addEventListener("click", () => {
+    fillForm()
+      .then(() => {
+        console.log("Form filled successfully!");
+      })
+      .catch((error) => {
+        console.log("Error:", error)
+        const erMsg = "Not enough info to complete character sheet";
+        callError(erMsg);
+      });
+});
 
 async function fillForm() {
     // Fetch the PDF with form fields
@@ -1835,52 +1719,539 @@ async function fillForm() {
     const aspectsField = form.getTextField('Aspects');
 
     // Fill in pdf fields
-    nameField.setText(pcFirstName + " " + pcLastName);
-    speciesField.setText(pcSpecies);
+    //if (pcList[0].name) {nameField.setText(pcList[0].name)};
+    nameField.setText(pcList[0].name)
+    speciesField.setText(pcList[0].species);
     wealthGroup.select(wealthOptions[wealthDropFix]);
     
-    
-    
-    if (pcInclinations.length <= 0) {
-        rollInclination();
-        console.log("Auto rolled 2 Inclinations")
+    if (pcList[0].inclinations.length <= 0) {
+        getInclinations(1);
+        console.log("Auto rolled Inclinations")
     };
 
     inclField.setText(
-        pcInclinations.join('\n')
+        pcList[0].inclinations.join('\n')
     );
 
-    karmaDrop.select(karmaOptions[karma]);
+    karmaDrop.select(karmaOptions[pcList[0].karma]);
     
-    boonsField.setText(pathBoons);
-    sorcDetailsField.setText(pcCircleDetails);
-    gearField.setText(pcGearList.join(", "));
+    if (pcList[0].boons) {boonsField.setText(pcList[0].boons.join(", "))};
 
-    detailsField.setText(pcDescription);
-    featuresField.setText(pathFeatures);
-    sorcCircleField.setText(pcCircle);
-    armorField.setText("M. Save: " + miracleSave);
+    if (pcList[0].path === "Conjurer") {
+        sorcCircleField.setText(pcList[0].circleTxt);
+        sorcDetailsField.setText("Pages 35-39 detail the Circles of Sorcery. ");
+    }
+    
+    gearField.setText(pcList[0].equipment.join(", "));
+    detailsField.setText(pcList[0].description);
+    featuresField.setText(pcList[0].features);
+    
+    armorField.setText("M. Save: " + pcList[0].miracleSave);
 
     //heroDrop.select(heroOptions[1]); //set by default
     
     aSaveDrop.select(aSaveOptions[aSaveOption]);
 
-    healthField.setText(pcStrikes);
-    aspectsField.setText(pcStory);
+    healthField.setText(pcList[0].strikes);
+    aspectsField.setText(pcList[0].story);
 
-    potionsField.setText(
-        pcPotions.join('\n'),
-    );
-    scrollsField.setText(
-        pcScrolls.join('\n'),
-    );
-    //weaponsField.setText("Add your own weapon");
-    pathField.setText(pcPath);
-    strikesField.setText(pcStrikes);
+    if (pcList[0].potions) {
+        potionsField.setText(
+            pcList[0].potions.join('\n'),
+        );
+    };
+    if (pcList[0].scrolls) {
+        scrollsField.setText(
+            pcList[0].scrolls.join('\n'),
+        );
+    };
+    weaponsField.setText("Decide on your weaponry (pg. 40)");
+    pathField.setText(pcList[0].path);
+    strikesField.setText(pcList[0].strikes);
 
     // Serialize the PDFDocument to bytes (a Uint8Array)
     const pdfBytes = await pdfDoc.save();
 
     // Trigger the browser to download the PDF document
-    download(pdfBytes, pcFirstName + " " + pcLastName, "application/pdf");
+    download(pdfBytes, pcList[0].name, "application/pdf");
 };
+
+
+///// CUSTOM BUILDER /////
+class PC {
+    constructor() {
+        this.isBuilder = false;
+        this.name = "";
+        this.basics = "";
+        this.story = "";
+        this.style = "";
+        this.core = "";
+        this.description = "";
+        this.wealth = "";
+        this.wealthTier = 0;
+        this.path = "";
+        this.circle = "";
+        this.circleTxt = "";
+        this.species = "";
+        this.boons = [];
+        this.banes = [];
+        this.features = "";
+        this.maxInclinations = 2;
+        this.inclinations = [];
+        this.incTip = null;
+        this.equipment = [];
+        this.scrolls = [];
+        this.potions = [];
+        this.karma = "";
+        this.strikes = "";
+        this.armorType = "";
+        this.armorSave = "";
+        this.miracleSave = "";
+        this.bodyType = "";
+        this.bodyBuild = "";
+        this.bodyHeight = "";
+        this.bodyVoice = "";
+    };
+
+    resetToDefault() {
+        const defaults = new PC();
+        // Copy default values to the current instance
+        Object.assign(this, defaults);
+    };
+
+    setBuilder() {
+        this.isBuilder = true;
+    }
+
+    setGenTool() {
+        this.isBuilder = false;
+    }
+
+    mapPropertiesToHtml() { // associate this with doc IDs
+        const propertyMapping = [];
+
+        // Define the mapping of properties to HTML element IDs
+        const mapping = {
+            name: "name",
+            basics: "build-txt",
+            path: "path",
+            circle: "circle",
+            strikes: "strikes",
+            boons: "boons",
+            features: "features",
+            armorType: "armor",
+            armorSave: "aSave",
+            miracleSave: "mSave",
+            karma: "karma",
+            wealth: "wealth",
+            inclinations: "inclinations",
+            incTip: "inc-tip",
+            equipment: "gear",
+            potions: "potions",
+            scrolls: "scrolls",
+            species: "species",
+            story: "story",
+            core: "core",
+            description: "phys",
+        };
+
+        // If useEmojiIds is true, update the mapping to use emoji-prefixed IDs
+        if (this.isBuilder) {
+            for (const prop in mapping) {
+                mapping[prop] = `📝${mapping[prop]}`;
+            }
+        }
+
+        for (const prop in this) {
+            const id = mapping[prop];
+            if (id !== undefined) {
+                const htmlElement = document.getElementById(id);
+                const propValue = this[prop];
+                propertyMapping.push({
+                    prop: propValue,
+                    id: htmlElement,
+                });
+            }
+        }
+
+        return propertyMapping;
+    }
+
+    showInfo(mapping) {
+        // Check if mapping is valid and has an associated HTML element
+        if (mapping && mapping.id) {
+            // Check if the property is an array
+            if (Array.isArray(mapping.prop)) {
+                // If it's an array, join it with ", " and set as innerHTML
+                mapping.id.innerHTML = mapping.prop.join(", ");
+            } else {
+                // If not an array, set the innerHTML as is
+                mapping.id.tagName.toLowerCase() === 'input'
+                ? (mapping.id.value = mapping.prop)
+                : (mapping.id.innerHTML = mapping.prop);
+                // was working: mapping.id.innerHTML = mapping.prop;
+            }
+        }  
+    }
+
+    displayValid() {
+        //const propertiesMapping = this.mapPropertiesToHtml(checker);
+        const propertiesMapping = this.mapPropertiesToHtml();
+
+        for (const mapping of propertiesMapping) {
+            const propValue = mapping.prop;
+
+            // Check if propValue is valid based on your conditions
+            const isValid =
+                propValue !== null &&
+                !(Array.isArray(propValue) && propValue.length === 0) &&
+                propValue !== 0 && propValue != "";
+            if (isValid) {
+                this.showInfo(mapping);
+            }
+            // if (!isValid) {
+            //     this.hideInfo(mapping);
+            // }
+        }
+    };
+
+    getWealth(checker, btn) {
+
+        if (checker == 1) { // custom builder random
+            const { wealth, wealthTier } = rollWealth();
+            this.wealth = wealth;
+            this.wealthTier = wealthTier;
+        } else if (checker == 2) { // custom builder manual
+            // const { wealth, wealthTier } = rollWealth(checker, getButtonText(btn));
+            this.wealth = getButtonText(btn);
+            this.wealthTier = rollWealth(2, getButtonText(btn))
+        }
+        else { // main tool random
+            const { wealth, wealthTier } = rollWealth();
+            this.wealth = wealth;
+            this.wealthTier = wealthTier;
+            displayGear.style.display = "block"
+        }
+        this.updateStats();
+    };
+
+    getPath(checker, btn) {
+        if (checker == 1) { // custom builder random
+            this.path = randomMath(pathsArray);
+        } else if (checker == 2) { // custom builder manual
+            this.path = getButtonText(btn);
+        }
+        else { // main tool random
+            this.path = randomMath(pathsArray);
+            displayPath.style.display = "block"
+        }
+
+        // Set the dropdown to default and avoid errors
+        //selectBtn.firstElementChild.innerText = "Select a Path";
+    
+        if (this.path === "Conjurer") {
+            this.circle = "Circle of Sorcery: " + randomMath(circlesArray);
+            this.circleTxt = this.circle.substring("Circle of Sorcery: ".length);
+            console.log('magic circle is ' + this.circle);
+            this.getScrolls();
+        } else if (this.path === "Skald") {
+            this.getScrolls();
+        }
+
+        this.updateStats();
+        //this.displayValid(checkBuilder);
+        console.log("A path was chosen:", this.path);
+    };
+
+    getSpecies(checker, btn) {
+        this.species = rollSpecies();
+
+        if (checker == 2) { // custom builder manual
+            pcList[0].species = getButtonText(btn);
+        };
+       if (!checker) { // original random tools
+            displaySpecies.style.display = "block";
+        };
+        this.updateStats();
+    };
+
+    getIncTxt() {
+        return (this.maxInclinations - this.inclinations.length) + " of " + this.maxInclinations + " remaining."
+    }
+
+    getInclinations(checker, btn) {
+        this.updateStats();
+
+        if (checker == 1) { // custom builder random
+            this.rollInclination();
+        } else if (checker == 2) { // custom builder manual
+            this.rollInclination(getButtonText(btn));
+        }
+        else { 
+            displayIncl.style.display = "block"
+            this.rollInclination();
+        } 
+        this.updateStats();
+    }
+
+    rollInclination(choice) {
+        if (!choice) {
+            this.inclinations = [];
+            for (let i = 0; i < this.maxInclinations; i++) {
+                let tempIncl = randomMath(inclinationsArray);
+                if (!this.inclinations.includes(tempIncl)) {
+                    // Only runs if value not already in array
+                    this.inclinations.push(tempIncl);
+                    console.log(tempIncl);
+                } else {
+                    console.log(tempIncl + " was a duplicate.");
+                    this.rollInclination(); // Restart to avoid duplicates.
+                }
+            };
+        } else if (choice) {
+            if (this.inclinations.length < this.maxInclinations) {
+                if (!this.inclinations.includes(choice)) {
+                    // Only runs if value not already in array
+                    this.inclinations.push(choice);
+                    console.log(choice);  
+                } else { console.log(choice + " was a duplicate") }
+            } else {
+                const erMsg = "Maximum Inclinations has been reached."
+                callError(erMsg)
+            }
+        }
+        console.log(this.inclinations.join(", "));
+        this.getKarma(); // Karma total is based off Inclinations.
+        this.updateStats();
+    };
+
+    getKarma() {
+        if (this.inclinations.includes("Born Blessed")) {
+            this.karma = "6";
+        } else {
+            this.karma = "3";
+        }
+        console.log(this.karma);
+    }
+
+    getBody(checker, input) {
+        if (!input) { // random tool was used
+            this.bodyType = "My body type is " + randomMath(bodyTypes);
+        this.bodyBuild = ", build is " + randomMath(bodyBuilds);
+        this.bodyHeight = ", and I'm " + randomMath(bodyHeights);
+        this.bodyVoice = " with a " + randomMath(bodyVoices) + " voice.";
+
+        this.description = this.bodyType + this.bodyBuild + this.bodyHeight + this.bodyVoice;
+            console.log("Random description:", this.description)
+        } else { // user typed custom info
+            this.description = input;
+            console.log("Custom description:", this.description)
+        }
+        this.displayValid();
+        this.updateStats();
+    };
+
+    updateStats() {
+        this.features = null;
+        this.boons = [];
+        if (this.path === "Brute") {
+            this.strikes = "5"
+        } else {
+            this.strikes = "3"
+        }
+        
+        /// ### Path Specific Tasks ###
+        if (this.path === "Warrior") {
+            aSaveOption = 1; //for pdf
+            this.armorSave = "3+";
+            this.miracleSave = "6";
+            this.armorType = "Heavy"
+            this.boons.push("Melee, Strength Tasks")
+            this.features = "Shield Sacrifice, Brutal Strikes, Dual Weapons, Armor save 4+ w/o shield"
+        } else if (this.path === "Warden") {
+            aSaveOption = 3; //for pdf
+            this.armorSave = "5+"
+            this.miracleSave = "6"
+            this.armorType = "Medium"
+            this.boons.push("Ranged Weapons, Wilderness Tasks")
+            this.features = "Trailfinder, Forager"
+        } else if (this.path === "Delver") {
+            aSaveOption = 3; //for pdf  
+            this.armorSave = "5+"
+            this.miracleSave = "6"
+            this.armorType = "Medium"
+            this.boons.push("Melee OR Ranged Weapons, Spelunking Tasks")
+            this.features = "Gear, Jack"
+        } else if (this.path === "Brute") {  
+            aSaveOption = 4; //for pdf
+            this.armorSave = "6"
+            this.miracleSave = "6"
+            this.armorType = "Light"
+            this.boons.push("Melee, Strength Tasks")
+            this.features = "Enrage, Superstitious"
+        } else if (this.path === "Rascal") {  
+            aSaveOption = 4; //for pdf
+            this.armorSave = "6 with a boon"
+            this.miracleSave = "6 with a boon"
+            this.armorType = "Light"
+            this.boons.push("Acrobatic Tasks")
+            this.features = "Tricks, Gank, Boon to Armor & Miracle saves"
+        } else if (this.path === "Conjurer") {  
+            aSaveOption = 4; //for pdf
+            this.armorSave = "6"
+            this.miracleSave = "6"
+            this.armorType = "Light"
+            this.boons.push("Magickal Mystery Tasks")
+            this.features = "Mystic Barrier, Master of Magick, Wand or Staff"
+        } else if (this.path === "Friar") { 
+            aSaveOption = 3; //for pdf 
+            this.armorSave = "5+"
+            this.miracleSave = "5+"
+            this.armorType = "Medium"
+            this.boons.push("Resist Heritical Powers (magick), Religious Knowledge")
+            this.features = "Empathic Healing, Holy Light"
+        } else if (this.path === "Skald") {  
+            aSaveOption = 3; //for pdf
+            this.armorSave = "5+"
+            this.miracleSave = "5+"
+            this.armorType = "Medium"
+            this.boons.push("Lore Tasks, Performance Tasks")
+            this.features = "Scrollmaster, Traveler, Strands of Fate"
+        } else if (this.path === "Beastmaster") {
+            aSaveOption = 3; //for pdf
+            this.armorSave = "5+"
+            this.miracleSave = "6"
+            this.armorType = "Medium"
+            this.boons.push("Melee OR Ranged Weapons, Beast Empathy")
+            this.features = "Beastspeech, Beast Aid, Beast Friend"
+        } else if (this.path === "" || this.path == null) {
+            this.armorSave = null;
+            this.miracleSave = "";
+            this.armorType = "";
+            this.boons = "";
+            this.features = "";
+            this.scrolls = "";
+            this.potions = "";
+        }
+
+        if (this.path === "Delver" && this.species === "Human") {
+            this.maxInclinations = 4;
+        } else if (this.species === "Human" || this.path === "Delver") {
+            this.maxInclinations = 3;
+        } else {
+            this.maxInclinations = 2;
+        }// Path and species determines number of Incl rolls.
+
+        if (this.inclinations.length > this.maxInclinations) {
+            // Calculate the number of items to remove
+            const itemsToRemove = this.inclinations.length - this.maxInclinations;
+
+            // Use splice to remove items from the beginning of the array
+            this.inclinations.splice(0, itemsToRemove);
+        }
+
+        this.incTip = this.getIncTxt();
+        console.log("max incs:", this.maxInclinations)
+        this.displayValid()
+    };
+
+    getScrolls() {
+        this.scrolls = [];
+        this.scrolls.push(randomMath(scrollsArray));
+        this.scrolls.push(randomMath(scrollsArray));
+        console.log("User rolled new scrolls:", this.scrolls);
+
+       if (!this.isBuilder) { // original random tools
+            displayScrolls.style.display = "block";
+        };
+        this.displayValid();
+        this.updateStats();
+    };
+
+    getName(checker, input) {
+        if (!input) { // random tool was used
+            const { first, last} = rollName();
+            this.name = first + " " + last;
+            console.log("Random name:", this.name)
+        } else { // user typed custom info
+            this.name = input;
+            console.log("Custom name:", this.name)
+        }
+        this.displayValid();
+        this.updateStats();
+
+        if (checker !== 1) { // custom builder random
+            document.getElementById("nam").style.display = "block"
+        }
+    };
+
+    getStory(checker, input) {
+
+        if (!input) { // random tool was used
+            this.story = rollStory();
+            console.log("Random story:", this.story)
+        } else { // user typed custom info
+            this.story = input;
+            console.log("Custom story:", this.story)
+        }
+        this.displayValid();
+        this.updateStats();
+
+        if (checker !== 1) { // custom builder random
+            //document.getElementById("nam").style.display = "block"
+        }
+    };
+
+    getCore() {
+        this.core = rollCore();
+        this.displayValid();
+    };
+
+    rollGear() {
+        pcList[0].equipment = [];
+        if (pcList[0].equipment.length <= 0) {
+            for (let i = 0; i < pcList[0].wealthTier * 3; i++) {
+                pcList[0].equipment.push(randomMath(gearArray));
+            }
+        }
+        console.log(pcList[0].equipment.join(", "));
+        pcList[0].equipment.join(", ");
+    };
+
+    getGear(checker, btn) {
+        if (this.wealthTier <= 0) {
+            this.getWealth(1);
+        }
+    
+        if (checker == 1) { // only for custom builder
+            this.rollGear();
+        } else if (checker == 2) { // user selected with btn
+            this.equipment.push(getButtonText(btn));
+        }
+        else { // random tool was used
+            this.rollGear();
+            displayGear.style.display = "block";
+        }
+        this.displayValid();
+        this.updateStats();
+    };
+
+    getPotions(checker) {
+        this.potions = [];
+        this.potions.push(randomMath(potionsArray));
+        this.potions.push(randomMath(potionsArray));
+
+        console.log("User rolled new potions:", this.potions);
+
+        if (!checker) { // random tool was used
+            displayPotions.style.display = "block";
+        }
+        this.displayValid();
+        this.updateStats();
+    };
+
+}
+pcList.push(new PC);
+// console.log(pcList[0].mapPropertiesToHtml())
+  
+  

@@ -167,16 +167,28 @@ fieldset {
   width: 100%;
   font-weight: normal;
   color: whitesmoke;
+  cursor: pointer;
 }
 
 .tab-options input[type="radio"] {
   display: none;
 }
 
+.tab-options label:hover {
+  background: #99ca3c;
+  opacity: 50%;
+  color: #000000;
+}
+
 .tab-options input[type="radio"]:checked + label {
   background: #99ca3c;
+  opacity: 100%;
   /*   border: 1px solid rgba(0, 0, 0, 0.1); */
   color: #000000;
+}
+
+#tab-toggle {
+  user-select: none;
 }
 
 .glide-main {

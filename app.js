@@ -52,6 +52,14 @@ const MAX_LORDLY = 99000;
 const MAX_WEALTHY = 80000;
 const MAX_MODERATE = 75000;
 const MAX_POOR = 1000;
+const wwWealth = [
+    "Skint",  // Can barely afford supplies (3 per week), cannot afford gear.
+    "Hard-up",  // Up to 6 supplies per week, can buy one cobbled weapon at a Hold.
+    "Stiff",  // Up to 10 supplies per week, can buy up to 3 items including benchmark weapons.
+    "Shiny",  // Unlimited supplies, can buy any gear at a Hold including modified weapons.
+    "Chrome",  // Can afford anything for sale including vehicles and upgrades, may have underlings.
+    "Loaded"  // Can buy anything, holds are well-defended, a VIP in the wasteland.
+];
 
 /// PC VARIABLES CALLED IN VARIOUS FUNCTIONS ///
 const pcList = [];
@@ -939,6 +947,100 @@ const magicName2 = [
     "Writhe", 
     "Breath"
 ];
+
+const wwWeaponsArr = [
+    "Ammo",
+    "Assault Rifle (Lg)",
+    "Bow (Lg)",
+    "Crossbow (Lg)",
+    "Flash Bang Grenade (Sm)",
+    "Grenade (Sm)",
+    "Melee Weapon",
+    "Molotov (Sm)",
+    "Pipebomb (Sm)",
+    "Pistol",
+    "Rifle (Lg)",
+    "Shotgun (Lg)",
+    "SMG",
+    "Smoke Grenade (Sm)"
+];
+
+const wwGearArr = [
+    "Backpack",
+    "Binoculars",
+    "Daily Ration",
+    "Ducktape (Sm)",
+    "Filtered Canteen",
+    "Filtered Mask (Sm)",
+    "Flashlight (Sm)",
+    "Folding Shovel (Lg)",
+    "Goggles (Sm)",
+    "Grappling Hook",
+    "Handcuffs (Sm)",
+    "Hooch (Sm)",
+    "Jar (Sm)",
+    "Jimmy Bar",
+    "Junk Armor (Armor Slot)",
+    "Junk Shield (Shield Slot)",
+    "Kreemy Kake (Sm)",
+    "Portable Mess Kit",
+    "Rope (Lg)",
+    "Small Fire Extinguisher",
+    "Tap Torch (Tapper)",
+    "Tarp Cloak",
+    "Universal Pocket Knife (Sm)",
+    "Wonderslab (Sm)"
+];
+
+const drugsArray = [
+    "Therataine (Insta-Heal)",
+    "Kinonorphine (Pain-Away)",
+    "SimFlesh Pack",
+    "Halcitane (Buff)",
+    "Ecpromal (Pure)",
+    "Specuran (Cure-All)",
+    "Zevatonin (Flush)",
+    "Retroban (Happy)",
+    "Predigrel (Purge)",
+    "Med Kit"
+];
+
+const meleeWeaponMods = [
+    "Electrified (Lg) - Stuns target on crit",
+    "Spiked (Lg) - Inflicts 2 strikes on first crit",
+    "Weighted (Lg) - Causes target to fall prone on crit",
+    "Whirring Blades (Lg) - Counterstrike on attacker rolling 1"
+];
+
+const speacialWeaponMods = [
+    "Burner (Lg) - Sprays chemical fire, sets targets alight",
+    "Burner Fuel Canister (Sm) - Ammo for Burner, lasts 1 scene",
+    "Grappler Gun (Lg) - Fires barbed hook, can pull targets",
+    "Nailer Gun (Lg) - Fires large nails, can pin targets",
+    "Nailer Ammo - Ammo for Nailer Gun, counts as supply",
+    "Pressure Canister (Sm) - Pressure for Nailer/Grappler, lasts a day",
+    "Rocket Launcher (Lg) - Fires HE rockets, 4 strikes on hit",
+    "Rockets (Sm) - Ammo for Rocket Launcher"
+];
+
+const vehicleModificationsArray = [
+    "Reinforced Frame - Boon to Last Ditch Save (LDS)",
+    "Welded Armor - Reroll failed Structure Save once per round",
+    "Juiced - Outrun vehicles in same/lower class",
+    "Tire Grips - Boon to Maneuver Rolls",
+    "Spiked Body - Strike grapplers on a 4+",
+    "Heavy Machine Gun Mount - 2 strikes, crits on 5+",
+    "Reinforced Ram - Reroll one rammage die",
+    "Powered Winch - 100 ft metal cable for pulling",
+    "Smokescreen - Bane to pursuers for 1 round",
+    "Killjacks - Deploy caltrops, forces MvR 6",
+    "Rigged to Blow - Vehicle detonates if tampered with",
+    "Hellfire Roaster - Sets pursuers on fire",
+    "Boom Spear - Explosive lance, 2 strikes on hit",
+    "Trailer - Adds cargo, bane to maneuvers",
+    "Steering Wheel Lock Bar - Prevents vehicle theft"
+];
+
 
 /// EASE OF USE FUNCTIONS
 function fadeInElements(elementIds) {
@@ -2386,8 +2488,414 @@ class PC {
         this.updateStats();
     };
 
-}
+};
 pcList.push(new PC);
 // console.log(pcList[0].mapPropertiesToHtml())
+
+function pickUnique(array, count) {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+}
+
+class WastedPath {
+    constructor() {
+        this.strikes = 3;
+        this.path = null;
+        this.wealth = { name: "Hard-Up", value: 2 };
+        this.inclinations = [];
+        this.aspects = [];
+        this.avoidance = 6;
+        this.miasmaResistance = "1D6";
+        this.armor = { name: "Junk Armor", value: 5 };
+        this.gear = [];
+        this.possibleEdges = [];
+        this.edges = [];
+        this.init();
+    }
+
+    // Initializes a Survivor character
+    init() {
+        this.path = randomMath(wwPathsArray);
+        this.applyPathAttributes();
+        this.aspects = pickUnique(survivorAspectsArray, 2);
+        this.addRandomGear();
+    }
+
+    // Applies path-specific attributes and gear
+    applyPathAttributes() {
+        switch (this.path) {
+            case "Android":
+                this.gear = [
+                    wwWeaponsArr[9],            // "Pistol"
+                    wwWeaponsArr[6],            // "Melee Weapon"
+                    wwGearArr[0],               // "Backpack"
+                    drugsArray[1] + " (x2)",    // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento",
+                    wwGearArr[20]               // "Tarp Cloak"
+                ];                  
+                this.possibleEdges = ["Defensive Shock", "Mimic"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["BioClear"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 1));
+                this.inclinations.push(...pickUnique(bioSynthPackagesArray, 2));
+                this.inclinations.push(...pickUnique([...bioSynthPackagesArray, ...survivorTalentsArray], 2));
+                break;
+            case "Clone":
+                this.armor = { name: "Skiensuit", value: 5 };
+                // this.gear = ["Benchmark combat knife", "backpack", "supplies (x3)", "Full Spectrum Wristband", "memento"];
+                this.gear = [
+                    wwWeaponsArr[6],                 // "Melee Weapon"
+                    wwGearArr[0],                    // "Backpack"
+                    "supplies (x3)",          
+                    "Full Spectrum Wristband",
+                    "memento"                 
+                ];
+                this.possibleEdges = ["Enhanced Legs", "Enhanced Coordination"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["Regen"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 1));
+                this.inclinations.push(...pickUnique(dnaModsArray, 2));
+                this.inclinations.push(...pickUnique([...dnaModsArray, ...survivorTalentsArray], 2));
+                break;
+            case "Hunter":
+                // this.gear = ["Cobbled rifle", "skinning knife", "binoculars", "tarp cloak", "backpack", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[10],            // "Rifle (Lg)"
+                    wwWeaponsArr[6],             // "Melee Weapon"
+                    wwGearArr[1],                // "Binoculars"
+                    wwGearArr[20],               // "Tarp Cloak"
+                    wwGearArr[0],                // "Backpack"
+                    "supplies (x3)",
+                    "memento"
+                ];
+                this.possibleEdges = ["Sneak Attack", "Harvester"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["Wasteland Ranger", "Hunters Weapon"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 4));
+                break;
+            case "Mutie":
+                // this.gear = ["Cobbled melee weapon", "rope", "tarp cloak", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[6],                // "Melee Weapon"
+                    wwGearArr[18],                  // "Rope (Lg)"
+                    wwGearArr[20],                  // "Tarp Cloak"
+                    wwGearArr[0],                   // "Backpack"
+                    drugsArray[1] + " (x2)",        // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["Adaptive Stomach", "Torpor"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations.push(...pickUnique(physicalMutationsArray, 2));
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 2));
+                this.inclinations.push(...pickUnique([...physicalMutationsArray, ...survivorTalentsArray], 2));
+                break;
+            case "Machine Head":
+                // this.gear = ["Cobbled pistol", "tool belt", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[9],            // "Pistol"
+                    "tool belt",
+                    wwGearArr[0],               // "Backpack"
+                    drugsArray[1] + " (x2)",    // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["Quick Fix", "A.I. PalBot"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["Scrap Boss", "Repairs"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 4));
+                break;
+            case "Rambler":
+                // this.gear = ["Cobbled pistol", "Cobbled melee weapon", "musical instrument", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[9],            // "Pistol"
+                    wwWeaponsArr[6],            // "Melee Weapon"
+                    "musical instrument",
+                    wwGearArr[0],               // "Backpack"
+                    drugsArray[1] + " (x2)",    // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["Allies", "Legends After the Fall"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["Traveling Thespian", "Distraction"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 4));
+                break;
+            case "Scavie":
+                // this.gear = ["cobbled pistol", "cobbled melee weapon", "binoculars", "tarp cloak", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[9],            // "cobbled pistol"
+                    wwWeaponsArr[6],            // "cobbled melee weapon"
+                    wwGearArr[1],               // "Binoculars"
+                    wwGearArr[20],              // "Tarp Cloak"
+                    wwGearArr[0],               // "Backpack"
+                    drugsArray[1] + " (x2)",    // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["Personal Stash", "No Secrets"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["Scrap Seeker", "Rubble Rat"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 4));
+                break;
+            case "Wasteland Warrior":
+                // this.gear = ["cobbled pistol", "shield", "cobbled melee weapon", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[9],            // "Pistol"
+                    wwGearArr[15],              // "Junk Shield (Shield Slot)"
+                    wwWeaponsArr[6],            // "Melee Weapon"
+                    wwGearArr[0],               // "Backpack"
+                    drugsArray[1] + " (x2)",    // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["Prime Specimen", "Trigger Discipline"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations = ["War Ready", "Two Fisted"];
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 4));
+                break;
+            case "Weird":
+                this.armor = { name: "Base Armor", value: 6 };
+                this.miasmaResistance = "2D6";
+                // this.gear = ["glowstaff", "goggles", "tarp cloak", "charms", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    "Glowstaff",
+                    wwGearArr[8],                // "Goggles (Sm)"
+                    wwGearArr[20],               // "Tarp Cloak"
+                    "charms",
+                    wwGearArr[0],                // "Backpack"
+                    drugsArray[1] + " (x2)",     // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["Mental Shield", "Neuroflux"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations.push(...pickUnique(mentalMutationsArray, 2));
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 2));
+                this.inclinations.push(...pickUnique([...mentalMutationsArray, ...survivorTalentsArray], 2));
+                break;
+            case "Jack":
+                // this.gear = ["cobbled melee weapon", "tarp cloak", "rope", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+                this.gear = [
+                    wwWeaponsArr[6],                // "cobbled melee weapon"
+                    wwGearArr[20],                  // "tarp cloak"
+                    wwGearArr[18],                  // "rope" -> "Rope (Lg)"
+                    wwGearArr[0],                   // "backpack"
+                    drugsArray[1] + " (x2)",        // "Kinonorphine (Pain-Away) (x2)"
+                    "supplies (x3)",
+                    "memento"
+                ];                  
+                this.possibleEdges = ["One More"];
+                this.edges.push(randomMath(this.possibleEdges));
+                this.inclinations.push(...pickUnique(survivorTalentsArray, 7));
+                break;
+            default:
+                console.error("Could not assign a Path. Error Code: 2528.")
+        }
+    };
+
+    addRandomGear() {
+        let selectedList;
+        const lists = { weapons: wwWeaponsArr, gear: wwGearArr, drugs: drugsArray };
+        // const choice = prompt("Choose equipment list: weapons, gear, or drugs");
+        const choice = randomMath(Object.keys(lists));
+        selectedList = lists[choice] || wwGearArr;
+
+        let item;
+        do {
+            item = randomMath(selectedList);
+        } while (this.gear.includes(item));
+
+        this.gear.push(item);
+    };
+};
+
+// Example Usage
+const survivorBuilder = new WastedPath();
+console.log(survivorBuilder);
+
+
+
+
+// class WastedPath {
+//     constructor() {
+//         this.strikes = 3;
+//         this.path = null;
+//         this.inclinations = [];
+//         this.aspects = [];
+//         this.avoidance = 6;
+//         this.miasmaResistance = "1D6";
+//         this.armor = { name: "Junk Armor", value: 5 };
+//         this.gear = [];
+//         this.possibleEdges = [];
+//         this.edges = [];
+//         this.init();
+//     }
+
+//     // Initializes a Survivor character
+//     init() {
+//         this.path = randomMath(wwPathsArray);
+//         this.applyPathAttributes();
+//         this.inclinations = this.pickInclinations(this.path);
+//         this.aspects = this.pickSurvivorAspects();
+//     }
+
+//     // Applies path-specific attributes and gear
+//     applyPathAttributes() {
+//         switch (this.path) {
+//             case "Android":
+//                 this.armor = { name: "Junk Armor", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Cobbled pistol", "Cobbled melee weapon", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Defensive Shock", "Mimic"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Clone":
+//                 this.armor = { name: "Skiensuit", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Benchmark combat knife", "backpack", "supplies (x3)", "Full Spectrum Wristband", "memento"];
+//                 this.possibleEdges = ["Enhanced Legs", "Enhanced Coordination"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Mutie":
+//                 this.armor = { name: "Junk Armor", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Cobbled melee weapon", "rope", "tarp cloak", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Adaptive Stomach", "Torpor"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Weird":
+//                 this.armor = { name: "Base Armor", value: 6 };
+//                 this.miasmaResistance = "2D6";
+//                 this.gear = ["Glowstaff", "goggles", "tarp cloak", "charms", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Mental Shield", "Neuroflux"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Hunter":
+//                 this.armor = { name: "Junk Armor", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Cobbled rifle", "skinning knife", "binoculars", "tarp cloak", "backpack", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Sneak Attack", "Harvester"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Rambler":
+//                 this.armor = { name: "Junk Armor", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Cobbled pistol", "musical instrument", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Allies", "Legends After the Fall"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Scavie":
+//                 this.armor = { name: "Junk Armor", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Cobbled pistol", "binoculars", "tarp cloak", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Personal Stash", "No Secrets"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             case "Wasteland Warrior":
+//                 this.armor = { name: "Junk Armor", value: 5 };
+//                 this.miasmaResistance = "1D6";
+//                 this.gear = ["Cobbled pistol", "shield", "backpack", "pain away (x2)", "supplies (x3)", "memento"];
+//                 this.possibleEdges = ["Prime Specimen", "Trigger Discipline"];
+//                 this.edges.push(randomMath(this.possibleEdges));
+//                 break;
+//             default:
+//                 this.gear = ["Basic gear"];
+//                 this.possibleEdges = [];
+//         }
+//     }
+
+//     // Randomly selects inclinations based on path type
+//     pickInclinations(path) {
+//         switch (path) {
+//             case "Mutie":
+//                 return pickUnique(physicalMutationsArray, 6);
+//             case "Weird":
+//                 return pickUnique(mentalMutationsArray, 6);
+//             case "Clone":
+//                 return pickUnique(dnaModsArray, 5);
+//             case "Android":
+//                 return pickUnique(bioSynthPackagesArray, 5);
+//             default:
+//                 return pickUnique(survivorTalentsArray, 4);
+//         }
+//     }
+
+//     // Randomly picks unique Survivor Aspects
+//     pickSurvivorAspects(count = 2) {
+//         return pickUnique(survivorAspectsArray, count);
+//     }
+// };
+
+
+
+// Example Usage
+// const survivorBuilder = new WastedPath();
+// console.log(survivorBuilder);
+
+
+
+// class WastedPath {
+//     constructor() {
+//         this.paths = [
+//             ...pathsArray  // Assuming pathsArray already contains the updated list
+//         ];
+//         this.survivorTalents = [...survivorTalentsArray];
+//         this.physicalMutations = [...physicalMutationsArray];
+//         this.mentalMutations = [...mentalMutationsArray];
+//         this.dnaModifications = [...dnaModificationsArray];
+//         this.bioSynthPackages = [...bioSynthPackagesArray];
+//         this.aspects = [...survivorAspectsArray];
+//     }
+
+//     // Randomly picks a path
+//     pickRandomPath() {
+//         return this._randomElement(this.paths);
+//     }
+
+//     // Randomly selects inclinations based on path type
+//     pickInclinations(path) {
+//         switch (path) {
+//             case "Mutie":
+//                 return this._pickRandomInclinations(this.physicalMutations, 6);
+//             case "Weird":
+//                 return this._pickRandomInclinations(this.mentalMutations, 6);
+//             case "Clone":
+//                 return this._pickRandomInclinations(this.dnaModifications, 5);
+//             case "Android":
+//                 return this._pickRandomInclinations(this.bioSynthPackages, 5);
+//             default:
+//                 return this._pickRandomInclinations(this.survivorTalents, 4);
+//         }
+//     }
+
+//     // Randomly picks unique Survivor Aspects
+//     pickSurvivorAspects(count = 2) {
+//         return [...this.aspects]
+//             .sort(() => 0.5 - Math.random())
+//             .slice(0, count);
+//     }
+
+//     // Utility function to select one random element
+//     _randomElement(array) {
+//         return array[Math.floor(Math.random() * array.length)];
+//     }
+
+//     // Generates a full random Survivor character
+//     generateRandomSurvivor() {
+//         const path = this.pickRandomPath();
+//         const inclinations = this.pickInclinations(path);
+//         const aspects = this.pickSurvivorAspects();
+
+//         return {
+//             path,
+//             inclinations,
+//             aspects
+//         };
+//     }
+// };
+
+
   
   

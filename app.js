@@ -1041,6 +1041,79 @@ const vehicleModificationsArray = [
     "Steering Wheel Lock Bar - Prevents vehicle theft"
 ];
 
+const highTechLootArray = [
+    "Aegis Armor",
+    "Amphetanazol (Jump-Start)",
+    "Beamer (Lg)",
+    "Blastgun (Lg)",
+    "Earbud Coms (Sm)",
+    "EMP Grenade (Sm)",
+    "Energized Melee Weapon (Lg)",
+    "Extermination Grenade (Sm)",
+    "Full Spectrum Wristband (Sm)",
+    "Fusion Core (Sm)",
+    "Havoc Grenade (Sm)",
+    "Mag Rail Ammo (Sm)",
+    "Mag Rail Rifle (Lg)",
+    "Military-Grade Gas Mask",
+    "Newton Gun (Lg)",
+    "Night Vision Goggles",
+    "Plasma Cutter",
+    "Pulse Rifle (Lg)",
+    "Scouting Drone",
+    "Skiensuit",
+    "Smart Gun",
+    "Smart Gun Tracker Ammo Pack (Sm)",
+    "Stasis Gun (Lg)"
+];
+
+const crystallizedMiasmaArray = [
+    "Back from the Brink",
+    "Beacon",
+    "Conjure Car",
+    "Demon Weld",
+    "Doppelganger",
+    "Ghost in the Machine",
+    "Levitate",
+    "Luck Candy",
+    "Miasmic Whammy",
+    "Mind Ripper",
+    "Psychic Armor",
+    "Psychic Boom",
+    "Psychic Spore",
+    "Psychic Tentacle",
+    "The Silence",
+    "Third Eye",
+    "Time Jacker",
+    "Warp",
+    "Wisp"
+];
+
+const miasmagenicGraftsArray = [
+    "Bonesword",
+    "Clawed Feet",
+    "Eyestalk",
+    "Gliding Membranes",
+    "Lasher",
+    "Lil' Bro or Sis",
+    "Living Hair",
+    "Oversized Fangs",
+    "Stinger",
+    "Suckers"
+];
+
+const synthEnhancementsArray = [
+    "Ballistic Skin",
+    "Booming Voice",
+    "Cerebral Input Module",
+    "Cellular Transfer",
+    "Face Off",
+    "Full Spectrum Senses",
+    "Laser Vision",
+    "Lightbender",
+    "Radio Head"
+];
+
 
 /// EASE OF USE FUNCTIONS
 function fadeInElements(elementIds) {
@@ -2714,6 +2787,65 @@ class WastedPath {
 // Example Usage
 const survivorBuilder = new WastedPath();
 console.log(survivorBuilder);
+
+
+
+class Item {
+    constructor(name, size, quality, description, type, specialEffects = null, value = 0) {
+        this.name = name;
+        this.size = size;  // 'Small', 'Normal', 'Large'
+        this.quality = quality;  // 'Cobbled', 'Benchmark', 'Status'
+        this.description = description;
+        this.type = type;  // 'Weapon', 'Armor', 'Gear', 'Potion'
+        this.specialEffects = specialEffects;  // Additional perks or bonuses
+        this.value = value;  // Wealth value or barter worth
+    }
+
+    getSizeSlots() {
+        switch (this.size) {
+            case 'Small':
+                return 0.5;
+            case 'Normal':
+                return 1;
+            case 'Large':
+                return 2;
+            default:
+                return 1;
+        }
+    }
+
+    getQualityBonus() {
+        switch (this.quality) {
+            case 'Cobbled':
+                return 'May break on critical fail.';
+            case 'Benchmark':
+                return 'Reliable and durable.';
+            case 'Status':
+                return 'Grants boon to actions.';
+            default:
+                return 'Standard quality.';
+        }
+    }
+
+    describe() {
+        return `${this.name} [${this.type}] - ${this.quality} (${this.size}): ${this.description}`;
+    }
+}
+
+// Example Usage
+const pistol = new Item(
+    'Cobbled Pistol',
+    'Normal',
+    'Cobbled',
+    'A handgun pieced together from scrap, effective but unreliable.',
+    'Weapon',
+    { damage: '1d6', crit: '5+' },
+    3
+);
+
+console.log(pistol.describe());
+console.log('Size Slots:', pistol.getSizeSlots());
+console.log('Quality Bonus:', pistol.getQualityBonus());
 
 
 

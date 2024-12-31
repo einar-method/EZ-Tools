@@ -75,6 +75,20 @@ const pathsArray = [
     'Skald'
 ];
 
+const wwPathsArray = [
+    "Android",
+    "Clone",
+    "Hunter",
+    "Machine Head",
+    "Mutie",
+    "Rambler",
+    "Scavie",
+    "Wasteland Warrior",
+    "Weird",
+    "Jack"
+];
+
+
 const circlesArray = [
     "Arcane Bands", "Blastmaster", "Botanicalist", "Elementalist", "Illusionist", 
     "Necromancer", "Seer", "Shadoweaver", "Shapeshifter"
@@ -129,6 +143,128 @@ const inclinationsArray = [
     "Trapfinder",
     "Treasure Sense", 
     "Victory in Failure"
+];
+
+const survivorTalentsArray = [
+    "Acrobatic",
+    "Animal Empathy",
+    "Athletic",
+    "Big Guns",
+    "Catlike",
+    "Comfortably Numb",
+    "Cyborg",
+    "Damn Lucky",
+    "Danger Sense",
+    "Dealfinder",
+    "Hardy Constitution",
+    "Jacker",
+    "Klepto",
+    "Leadership",
+    "Leadfoot",
+    "Lucky Bastard",
+    "Marksman",
+    "Medic",
+    "Miasma Psyphon",
+    "Mysteries of the Fall",
+    "Nullbrain",
+    "Packrat",
+    "Paranoid",
+    "Psychic Node",
+    "Quicksilver",
+    "Regenerative Gutwurm",
+    "Rider",
+    "Shield Master",
+    "Silent Killer",
+    "Skirmisher",
+    "Slippery",
+    "Stalker",
+    "Swirling Attack",
+    "Tough Sumbitch",
+    "Trap Breaker",
+    "Traveling Sharpshooter",
+    "Unexpected Side Effect",
+    "Yakky"
+];
+
+const physicalMutationsArray = [
+    "Echolocation",
+    "Hardened Scales",
+    "Hump",
+    "Leaping",
+    "Prehensile Tail",
+    "Tusks or Horns",
+    "Retractable Claws",
+    "Rubbery",
+    "Spines",
+    "Sticky Spittle"
+];
+
+const mentalMutationsArray = [
+  "Befuddle",
+  "Brain Sift",
+  "ESP",
+  "Feedback",
+  "Jaunt",
+  "Lifetaker",
+  "Mind Force",
+  "Precog",
+  "Shimmer",
+  "Telepathy"
+];
+
+const dnaModsArray = [
+    "Advanced Tastebuds",
+    "Flexible Skeleton",
+    "Gel Excretion",
+    "Heightened Senses",
+    "Idyllic Memories",
+    "Modified Kidneys",
+    "Nictitating Membrane",
+    "Oily Excretion",
+    "Sleepless",
+    "Slowed Metabolism"
+];
+
+const bioSynthPackagesArray = [
+    "Cerebral Uplink",
+    "Hidden Compartment",
+    "Language Module",
+    "Luminous Eyes",
+    "Milk Blood",
+    "NuFlesh",
+    "Overdrive",
+    "Recharge Ports",
+    "Shielded Innards",
+    "Spectra Vision"
+];
+
+const survivorAspectsArray = [
+    // Aspects 1
+    "Hard drinker", "Great singing voice", "Found a scrap haul",
+    "Lousy Gambler", "Visionary", "Lucky in Love",
+    "Wanted", "Gunslinger", "Exterminator",
+    "Road hog", "Eclectic clothing", "Ew! Skin growths",
+    "Unemotional", "Vigilante", "Oddity collector",
+    "Dowser", "Saw too much", "Galahad",
+    "Distinct body odor", "Botanist",
+
+    // Aspects 2
+    "Seeking siblings", "Scientist", "Grifter",
+    "Geologist", "Tidy", "Arsonist",
+    "Junkie", "Odd eyes, hair, skin", "Playful",
+    "Gun nut", "Light sleeper", "Comedian",
+    "Socially invisible", "Psychologist", "Outrageous hairdo",
+    "Coward", "Can’t keep a secret", "Cool cat",
+    "Awoke from a pod", "Optimist",
+
+    // Aspects 3
+    "Orphaned", "Geometry expert", "Strong stomach",
+    "Sucker for sob story", "Hollow legs", "Pessimist",
+    "Nosey Parker", "Restorationist", "Mentor",
+    "Beast Hunter", "Vintage movie buff", "Kiss n’ Tell",
+    "Risk taker", "Never your fault", "Gearhead Prophet",
+    "Tech seeker", "A hugger", "Clear-headed",
+    "Lost Tribesman", "End is nigh type"
 ];
 
 const monstersArray = [

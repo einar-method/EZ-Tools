@@ -614,3 +614,7 @@ p {
 #📝clearBuild-btn {
   width: 100%;
 }
+
+#build-btn {
+  grid-column: 2 / -1; /* Starts at second column, spans to last */
+}

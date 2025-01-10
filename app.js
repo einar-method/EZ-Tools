@@ -973,12 +973,12 @@ function callTip(txt) {
     }, 3000);
 };
 
-window.onload = () => {
-    setTimeout(() => {
-        const welcome = "Try out the new custom build tool!";
-        callTip(welcome);
-    }, 3000);
-};
+// window.onload = () => {
+//     setTimeout(() => {
+//         const welcome = "Try out the new custom build tool!";
+//         callTip(welcome);
+//     }, 3000);
+// };
 
 
 function randomMath(input) {
@@ -1522,19 +1522,19 @@ possibleChoices.forEach(possibleChoice => possibleChoice.addEventListener('click
     if (userChoice === "build-btn") {
         showBuilder();
     };
-    if (userChoice === "settings-btn") {
-        const soon = "Coming soon for Settings:"
-        const soon1 = "Choose your preferred pdf."
-        const soon2 = "Or disable pesky tips and sounds"
-        callTip(soon);
-        setTimeout(() => {
-            callTip(soon1)
-        }, 3500);
-        setTimeout(() => {
-            callTip(soon2)
-        }, 7000);
+    // if (userChoice === "settings-btn") {
+    //     const soon = "Coming soon for Settings:"
+    //     const soon1 = "Choose your preferred pdf."
+    //     const soon2 = "Or disable pesky tips and sounds"
+    //     callTip(soon);
+    //     setTimeout(() => {
+    //         callTip(soon1)
+    //     }, 3500);
+    //     setTimeout(() => {
+    //         callTip(soon2)
+    //     }, 7000);
 
-    };
+    // };
     console.log("User pressed btn:", getButtonText(e.target), "-ID:", userChoice)
 }))
 
